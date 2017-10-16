@@ -2,22 +2,36 @@
 #include <stdlib.h>
 #include <string>
 #include <iostream>
+#include <cmath>
+#include "vector_v2.hpp"
 
+/* 
+** La structure distrib regroupe les infos nécéssaire 
+** à la structuration d'une distributions des particules
+** en dedans et en dehors du segment [0:1]
+*/
 struct distrib_t
 {
     distrib_t () {}
     distrib_t (unsigned size) : segs(size, 0) {}
     distrib_t (const distrib_t& d) : below(d.below), above(d.above), segs(d.segs) {}
-    unsigned below,
+    float below,
 	above;
-    std::vector<unsigned> segs;
+    vectorV2<float> segs;
 };
 
+/* 
+** Fonction qui renvoie un entier entre 0 et 1
+*/
 float ranf()
 {
   return (float) rand()/RAND_MAX; //fdsqfaze
 }
 
+/*
+** Analogue de la fonction de python (segmentation en n pts 
+** du segment réel entre min et max)
+*/
 std::vector<float> linspace(float min, float max, unsigned nb_pts)
 {
     std::vector<float> X(nb_pts);
@@ -25,6 +39,9 @@ std::vector<float> linspace(float min, float max, unsigned nb_pts)
     return X;
 }
 
+/* 
+** Fonctions de plot de 1 ou plusieurs vectors
+*/
 template<typename Tx, typename Ty>
 int plot(const std::vector<Tx>& X, const std::vector<Ty>& Y, const std::string& opt = std::string(), const std::string& title = std::string())
 {
