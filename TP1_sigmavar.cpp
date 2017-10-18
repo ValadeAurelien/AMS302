@@ -43,7 +43,7 @@ float inv_int_sigma(float y)
     else return (y-1.5)+0.7;
 }
 
-float P(float x, float mu, const constants_t& cst)
+float Phi(float x, float mu, const constants_t& cst)
 {
     if (x<0.3) return cst.l*exp(-x/mu);
     else if (x<0.7) return cst.l*exp((0.6-3*x)/mu);
@@ -91,37 +91,42 @@ distrib_t denom(const vectorV2<float>& parts, int nb_segs)
 	else distrib.segs.at( floor(nb_segs*val) )++;
     }
     distrib.above = distrib.above * nb_segs / parts.size();
-    for (auto &s : distrib.segs) s = s * nb_segs / parts.size();
+    distrib.segs  = distrib.segs  * nb_segs / parts.size();
     distrib.below = distrib.below * nb_segs / parts.size();
     return distrib;
 }
 
 int main(int argc, char**argv)
 {
-    if (argc!=4) return EXIT_FAILURE;
+    // Vérification des arguments en entrée 
+    if (argc!=4) {
+	cout << "Enter mu, nb_particules, nb_segments" << endl;
+	return EXIT_FAILURE;
+    }
     float mu;
     int nb_parts,
 	nb_segs;
-    mu = atof(argv[1]);
-    nb_parts = atoi(argv[2]); // i pour pas float bro
-    nb_segs  = atoi(argv[3]);
+    mu = atof(argv[1]);                 // mu du problème
+    nb_parts = floor(atof(argv[2]));    // Nombre de particules de l'échantillon (floor(atof()) pour pouvoir utiliser 1e6 etc...
+    nb_segs  = floor(atof(argv[3]));    // Finesse de segmentation de l'intervalle pour calculer le flux
+    if ( !mu ||
+	 !nb_parts ||
+	 !nb_segs ) {
+	throw invalid_argument("Mauvais arguments, ou mauvais types...");
+    }
     constants_t cst(mu);
-
-    // vector<float> Xtest = linspace(0, 1, 1000);
-    // vector<float> Ytest (1000);
-    // for (int i=0; i<1000; i++) Ytest[i] = inv_F_repartition(Xtest[i], mu);
-    // plot(Xtest, Ytest);
-
+    
     vectorV2<float> parts = trajs(mu, nb_parts, cst);
     vectorV2<float> X = linspace(0, 1, nb_segs);
     distrib_t distrib = denom(parts, nb_segs);
-    plot(X, distrib.segs, "w l");
+    plot(X, distrib.segs, "w l", "set yrange [0:];");
 
     vectorV2<float> Py (nb_segs) ;
-    for (int i = 0; i<nb_segs; i++) Py.at(i) = P(X.at(i), mu, cst);
-    plot(X, Py, "w l");
-
-    cout << "above / below : " << distrib.above << " / " << distrib.below << endl
-	 << "diff normalized : " << (distrib.segs-Py).norm()/Py.norm() << endl;
+    for (int i = 0; i<nb_segs; i++) Py.at(i) = Phi(X.at(i), mu, cst)/mu;
+    plot(X, Py, "w l", "set yrange [0:];" );
+    // for (int i = 0; i<nb_segs ; i++)
+    // 	cout << X.at(i) << " " << distrib.segs.at(i) << " " << Py.at(i) << endl;
+    cout << "#(above 1) / (below 0) : " << distrib.above << " / " << distrib.below << endl
+	 << "#diff normalized : " << (distrib.segs-Py).norm()/Py.norm() << endl;
     return EXIT_SUCCESS;
 }
