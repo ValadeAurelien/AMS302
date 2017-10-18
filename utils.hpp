@@ -1,4 +1,4 @@
-#include <vector>
+#include <vector>http://timmurphy.org/2014/04/26/using-fork-in-cc-a-minimum-working-example/
 #include <stdlib.h>
 #include <string>
 #include <iostream>
@@ -49,23 +49,22 @@ int plot(const std::vector<Tx>& X, const std::vector<Ty>& Y, const std::string& 
 	std::cout << "sizes don't match !" << std::endl;
 	return -1;
     }
-    FILE *pipe = popen("gnuplot -persistent", "w");
+    FILE *pipe = popen("gnuplot -p", "w");
     fprintf(pipe, ("set title '" + title + "' ; plot '-' " + opt + "\n").c_str());
     for (int i=0; i<X.size(); i++)
 	fprintf(pipe, "%f %f\n", (float) X.at(i), (float) Y.at(i));
+    fprintf(pipe, "pause -1;");
     fflush(pipe);
-    fclose(pipe);
-    return 0;
+    return pclose(pipe);
 }
 
 template<typename Ty>
 int plot(const std::vector<Ty>& Y, const std::string& opt = std::string(), const std::string& title = std::string())
 {
-    FILE *pipe = popen("gnuplot -persistent", "w");
+    FILE *pipe = popen("gnuplot -p", "w");
     fprintf(pipe, ("set title '" + title + "' ; plot '-' " + opt + "\n").c_str());
     for (int i=0; i<Y.size(); i++)
 	fprintf(pipe, "%f\n", (float) Y.at(i));
     fflush(pipe);
-    fclose(pipe);
-    return 0;
+    return pclose(pipe);
 }
