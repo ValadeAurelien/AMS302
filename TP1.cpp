@@ -15,6 +15,16 @@ enum source_t
     DELTA = 1
 }; 
 
+// Structure pour garder en mémoire le départ à l'arrivée de la particule
+struct part_trajectory_t
+{
+    part_trajectory_t () {};
+    part_trajectory_t (float _b, float _e) : begin(_b), end(_e) {};
+
+    float begin,
+	end;
+};
+
 /* Terme source, suivant qu'il est uniforme (typ_source vrai)
                   ou non-nul seulement en 0 (typ_source faux) */
 float source(source_t stype)
@@ -36,52 +46,70 @@ float Phi(float x, float mu, float sigma, source_t stype)
 	    return 1/sigma*(1-exp(-sigma/mu*x));
 	else
 	    return 1/sigma*(1-exp(-sigma/mu*(x-1)));
-    case DELTA:
+    case DELTA :
 	return 1/mu*exp(-sigma/mu*x);
     }
 }
 
 /* Fonction qui renvoie la distance en fonction de la 
    proba uniforme sur [0:1]  */
-float inv_F_repartition_propagateur(float x, float mu, float sigma)
+float inv_F_repartition_propagateur(float y, float mu, float sigma)
 {
-    return -mu * log(x) / sigma;
+    return -mu * log(y) / sigma;
 }
 
 /* Variable aléatoire suivant la densité de probabilité
    du libre parcours d'un neutron */
-float f_gene(float mu, float sigma, source_t stype)
-{ 
-    return inv_F_repartition_propagateur(ranf(), mu, sigma) + source(stype);
+part_trajectory_t one_traj(float mu, float sigma, source_t stype)
+{
+    float src = source(stype);
+    return part_trajectory_t( src, inv_F_repartition_propagateur(ranf(), mu, sigma) + src);
 }
 
 // Echantillon de taille n de cette variable aléatoire
-vectorV2<float> trajs(float mu, float sigma, int n, source_t stype)
+vector<part_trajectory_t> trajs(float mu, float sigma, int n, source_t stype)
 {
-    vectorV2<float> part(n);
+    vector<part_trajectory_t> parts(n);
     for(int i = 0 ; i < n ; i++)
     {
-	part.at(i) = f_gene(mu, sigma, stype);
+	parts.at(i) = one_traj(mu, sigma, stype);
     }
-    return part;
+    return parts;
 }
 
 /* Flux de particules dénombrant cet échantillon
    sur chaque segment de l'intervalle total */
-distrib_t denom(const vectorV2<float>& parts, int nb_segs)
+distrib_t denom(const vector<part_trajectory_t>& parts, int nb_segs, float mu)
 {
     distrib_t distrib(nb_segs);
-    for (auto const & val : parts) // sans indice
-    {
-	if (val>=1) distrib.above++; 
-	else if (val< 0) distrib.below++;
-	else distrib.segs.at( floor(nb_segs*val) )++;
+    int seg_beg,
+	seg_end;
+    for (auto const & val : parts) {
+	if (val.end>=1) {
+	    distrib.above++;
+	    seg_beg = ceil(nb_segs*val.begin);
+	    for (int i=seg_beg; i<nb_segs; i++) distrib.segs.at(i)++;
+	}
+	else if (val.end<0) {
+	    distrib.below++;
+	    seg_beg = ceil(nb_segs*val.begin);
+	    for (int i=0; i<seg_beg; i++) distrib.segs.at(i)++;
+	}
+	else {
+	    seg_beg = ceil(nb_segs*val.begin);
+	    seg_end = ceil(nb_segs*val.end);
+	    if (seg_end > seg_beg)
+		for (int i=seg_beg; i<seg_end; i++) distrib.segs.at(i)++;
+	    else
+		for (int i=seg_end; i<seg_beg; i++) distrib.segs.at(i)++;
+	}
     }
-    distrib.above = distrib.above * nb_segs / parts.size();
-    distrib.segs  = distrib.segs  * nb_segs / parts.size();
-    distrib.below = distrib.below * nb_segs / parts.size();
+    distrib.above = distrib.above / (abs(mu)*parts.size());
+    distrib.segs  = distrib.segs  / (abs(mu)*parts.size());
+    distrib.below = distrib.below / (abs(mu)*parts.size());
     return distrib;
 }
+
 
 int main(int argc, char**argv)
 {
@@ -106,16 +134,23 @@ int main(int argc, char**argv)
     if (stype_int==1) stype = CSTE;
     else stype = DELTA;
 
+    // Courbe théorique
     vectorV2<float> X = linspace(0, 1, nb_segs), // vecteurs des abscisses
 	Py (nb_segs);                            // vecteurs de la probabilité théorique
     for (int i=0; i<nb_segs; i++)
 	Py.at(i) = Phi(X.at(i), mu, sigma, stype);
-    
-    vectorV2<float> parts = trajs(mu, sigma, nb_parts, stype);  // calcule des trajectoires 
-    distrib_t distrib = denom(parts, nb_segs);                  // repartition dans les segments 
-    plot(X, distrib.segs, "w l");
-    plot(X, Py, "w l");
+
+    // Monte Carlo
+    vector<part_trajectory_t> parts = trajs(mu, sigma, nb_parts, stype);  // calcule des trajectoires 
+    distrib_t distrib = denom(parts, nb_segs, mu);                  // repartition dans les segments 
+
+    // Affichage
+    for (int i=0; i<nb_segs; i++)
+    	cout << Py.at(i) << " " << distrib.segs.at(i) << endl;
+    plot(X, distrib.segs, "w l", "set title 'MC'; set yrange [0:]; ");
+    plot(X, Py, "w l", "set title 'théorique'; set yrange [0:]; ");
     cout << "#(above 1) / (below 0) : " << distrib.above << " / " << distrib.below << endl
 	 << "#diff normalized : " << (distrib.segs-Py).norm()/Py.norm() << endl;
     return EXIT_SUCCESS;
 }
+
