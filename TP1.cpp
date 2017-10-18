@@ -90,16 +90,11 @@ int main(int argc, char**argv)
 	cout << "Enter mu, sigma, nb_particules, nb_segments, type source (constante=1, delta(0) = 2)" << endl;
 	return EXIT_FAILURE;
     }
-    float mu,
-          sigma;
-    int nb_parts,
-	nb_segs,
-	stype_int;
-    mu = atof(argv[1]);                 // mu du problème
-    sigma = atof(argv[2]);              // sigma du problème
-    nb_parts = floor(atof(argv[3]));    // Nombre de particules de l'échantillon
-    nb_segs  = floor(atof(argv[4]));    // Finesse de segmentation de l'intervalle pour calculer le flux
-    stype_int = atoi(argv[5]);          // Source uniforme ou seulement entrante à gauche
+    float mu = atof(argv[1]),              // mu du problème
+	sigma = atof(argv[2]);             // sigma du problème
+    int nb_parts = floor(atof(argv[3])),   // Nombre de particules de l'échantillon (floor(atof()) pour pouvoir utiliser 1e6 etc...
+	nb_segs  = floor(atof(argv[4])),   // Finesse de segmentation de l'intervalle pour calculer le flux
+	stype_int = atoi(argv[5]);         // Source uniforme ou seulement entrante à gauche
     if ( !mu ||
 	 !sigma ||
 	 !nb_parts ||

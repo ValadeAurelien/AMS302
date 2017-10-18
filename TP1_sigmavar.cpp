@@ -103,12 +103,9 @@ int main(int argc, char**argv)
 	cout << "Enter mu, nb_particules, nb_segments" << endl;
 	return EXIT_FAILURE;
     }
-    float mu;
-    int nb_parts,
-	nb_segs;
-    mu = atof(argv[1]);                 // mu du problème
-    nb_parts = floor(atof(argv[2]));    // Nombre de particules de l'échantillon (floor(atof()) pour pouvoir utiliser 1e6 etc...
-    nb_segs  = floor(atof(argv[3]));    // Finesse de segmentation de l'intervalle pour calculer le flux
+    float mu = atof(argv[1]);                 // mu du problème
+    int nb_parts = floor(atof(argv[2])),    // Nombre de particules de l'échantillon (floor(atof()) pour pouvoir utiliser 1e6 etc...
+	nb_segs  = floor(atof(argv[3]));    // Finesse de segmentation de l'intervalle pour calculer le flux
     if ( !mu ||
 	 !nb_parts ||
 	 !nb_segs ) {
