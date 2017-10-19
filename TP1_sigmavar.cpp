@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 #include <stdlib.h>
+#include <fstream>
 #include "utils.hpp"
 #include "vector_v2.hpp"
 
@@ -96,71 +97,50 @@ vector<part_trajectory_t> trajs(float mu, int n, const constants_t& cst)
     return parts;
 }
 
-// distrib_t denom(const vector<part_trajectory_t>& parts, int nb_segs, float mu)
-// {
-//     distrib_t distrib(nb_segs);
-//     for (auto const & val : parts) // sans indice
-//     {
-// 	if (val.end>=1) distrib.above++; 
-// 	else if (val.end< 0) distrib.below++;
-// 	else distrib.segs.at( floor(nb_segs*val.end) )++;
-//     }
-//     distrib.above = distrib.above * nb_segs / parts.size();
-//     distrib.segs  = distrib.segs  * nb_segs / parts.size();
-//     distrib.below = distrib.below * nb_segs / parts.size();
-//     return distrib;
-// }
-
-/* Flux de particules dénombrant cet échantillon
-   sur chaque segment de l'intervalle total */
-distrib_t denom(const vector<part_trajectory_t>& parts, int nb_segs, float mu)
+distrib_t denom(const vector<part_trajectory_t>& parts, int nb_segs, const constants_t& cst)
 {
     distrib_t distrib(nb_segs);
-    int seg_beg,
-	seg_end;
-    for (auto const & val : parts) {
-	if (val.end>=1) {
-	    distrib.above++;
-	    seg_beg = ceil(nb_segs*val.begin);
-	    for (int i=seg_beg; i<nb_segs; i++) distrib.segs.at(i)++;
-	}
-	else if (val.end<0) {
-	    distrib.below++;
-	    seg_beg = ceil(nb_segs*val.begin);
-	    for (int i=0; i<seg_beg; i++) distrib.segs.at(i)++;
-	}
-	else {
-	    seg_beg = ceil(nb_segs*val.begin);
-	    seg_end = ceil(nb_segs*val.end);
-	    if (seg_end > seg_beg)
-		for (int i=seg_beg; i<seg_end; i++) distrib.segs.at(i)++;
-	    else
-		for (int i=seg_end; i<seg_beg; i++) distrib.segs.at(i)++;
-	}
+    for (auto const & val : parts) // sans indice
+    {
+	if (val.end>=1) distrib.above++; 
+	else if (val.end< 0) distrib.below++;
+	else distrib.segs.at( floor(nb_segs*val.end) )++;
     }
-    distrib.above = distrib.above / (mu*parts.size());
-    distrib.segs  = distrib.segs  / (mu*parts.size());
-    distrib.below = distrib.below / (mu*parts.size());
+    distrib.above = distrib.above * nb_segs / (cst.l*parts.size()); // on divise par l'intégrale du propagateur
+    distrib.segs  = distrib.segs  * nb_segs / (cst.l*parts.size());
+    distrib.below = distrib.below * nb_segs / (cst.l*parts.size());
     return distrib;
 }
 
 int main(int argc, char**argv)
 {
     // Vérification des arguments en entrée 
-    if (argc!=4) {
-	cout << "Enter mu, nb_particules, nb_segments" << endl;
+    if (argc<4) {
+	cout << "Enter mu, nb_particules, nb_segments, "
+	     << "output style (none=1, plot=2, file=3, all=4) [, filename]"
+	     << endl;
 	return EXIT_FAILURE;
     }
     float mu = atof(argv[1]);                 // mu du problème
     int nb_parts = floor(atof(argv[2])),    // Nombre de particules de l'échantillon (floor(atof()) pour pouvoir utiliser 1e6 etc...
 	nb_segs  = floor(atof(argv[3]));    // Finesse de segmentation de l'intervalle pour calculer le flux
+    int output_style = atoi(argv[4]);
     if ( !mu ||
 	 !nb_parts ||
-	 !nb_segs ) {
+	 !nb_segs ||
+	 !output_style ) {
 	throw invalid_argument("Mauvais arguments, ou mauvais types...");
     }
-    constants_t cst(mu);
+    string fname;
+    if (output_style>2) {
+	if (argc>4)
+	    fname = argv[5];
+	else
+	    fname = "output_TP1_sigmavar";
+    }
 
+    // constants du problème
+    constants_t cst(mu);
     // Courbe théorique
     vectorV2<float> X = linspace(0, 1, nb_segs),
 	Py (nb_segs) ;
@@ -169,14 +149,30 @@ int main(int argc, char**argv)
     
     // Monte Carlo
     vector<part_trajectory_t> parts = trajs(mu, nb_parts, cst);
-    distrib_t distrib = denom(parts, nb_segs, mu);
+    distrib_t distrib = denom(parts, nb_segs, cst);
 
     // for (int i=0; i<nb_segs-1; i++)
     // 	cout << nb_segs*(distrib.segs.at(i+1)-distrib.segs.at(i)) << endl;
     // Affichage
-    plot(X, distrib.segs, "w l", "set title 'MC'; set yrange [0:]; ");
-    plot(X, Py, "w l", "set title 'théorique'; set yrange [0:]; ");
-    cout << "#(above 1) / (below 0) : " << distrib.above << " / " << distrib.below << endl
+    if (output_style>2) {
+	ofstream file (fname, fstream::out);
+	file << "#";
+	for (int i=0; i<argc; i++) file << argv[i] << " ";
+	file << endl;
+	file << "#distrib" << endl << "#X     Phi(MC)     Phi(th)" << endl;
+	for (int i=0; i<nb_segs; i++)
+	    file << X.at(i) << " " << distrib.segs.at(i) << " " << Py.at(i) << endl;
+	file << "#(above 1) / (below 0) : "
+	     << distrib.above << " / " << distrib.below << endl
+	     << "#diff normalized : " << (distrib.segs-Py).norm()/Py.norm()
+	     << endl;
+	file.close();
+    }
+    if (!(output_style % 2)) {
+	plot(X, distrib.segs, "w l", "set title 'MC'; set yrange [0:]; ");
+	plot(X, Py, "w l", "set title 'théorique'; set yrange [0:]; ");
+	cout << "#(above 1) / (below 0) : " << distrib.above << " / " << distrib.below << endl
 	 << "#diff normalized : " << (distrib.segs-Py).norm()/Py.norm() << endl;
+    }
     return EXIT_SUCCESS;
 }
