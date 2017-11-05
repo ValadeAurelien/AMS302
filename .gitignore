@@ -2,3 +2,8 @@
 *.out 
 *log*
 *.png
+#*
+*.aux
+*.log
+*.out
+*/auto/*

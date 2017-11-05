@@ -58,7 +58,7 @@ void one_traj(part_trajectory_t& part, float sigma_a, float sigma_s, source_t st
 	if ( x<0 || x>1 ) break;
 	p_abs = ranf();
 	p_diff = ranf();
-	if ( p_diff<1-sast ) {
+	if ( p_diff<1-sast && !(stype==DELTA && x==0)) {
 	    part.push_back(x);
 	    mu = 2*ranf()-1;
 	}
