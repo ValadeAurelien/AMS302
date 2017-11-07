@@ -115,7 +115,7 @@ distrib_t denom(const vector<part_trajectory_t>& parts, int nb_segs, const const
 int main(int argc, char**argv)
 {
     // Vérification des arguments en entrée 
-    if (argc<4) {
+    if (argc<5) {
 	cout << "Enter mu, nb_particules, nb_segments, "
 	     << "output style (none=1, plot=2, file=3, all=4) [, filename]"
 	     << endl;
@@ -133,7 +133,7 @@ int main(int argc, char**argv)
     }
     string fname;
     if (output_style>2) {
-	if (argc>4)
+	if (argc>5)
 	    fname = argv[5];
 	else
 	    fname = "output_TP1_sigmavar";

@@ -192,7 +192,7 @@ Ces fonctions sont représentés dans la \autoref{fig:delta_many_mu}.
 
 \begin{figure}
   \centering
-  \includegraphics[height=.4\textheight]{../phi_source_delta_many_mu}
+  \includegraphics[height=.4\textheight]{phi_source_delta_many_mu}
   \caption{Fonctions $\Phi$ pour différent $\mu$.}
   \label{fig:delta_many_mu}
 \end{figure}
@@ -203,9 +203,9 @@ Cf code commenté.
 
 \begin{figure}
   \centering
-  \includegraphics[height=0.3\textheight]{../phi_sigma_cst_source_delta}
-  \includegraphics[height=0.3\textheight]{../phi_sigma_cst_source_cste}
-  \includegraphics[height=0.3\textheight]{../phi_sigma_cst_source_cste_mu_neg}
+  \includegraphics[height=0.3\textheight]{phi_sigma_cst_source_delta}
+  \includegraphics[height=0.3\textheight]{phi_sigma_cst_source_cste}
+  \includegraphics[height=0.3\textheight]{phi_sigma_cst_source_cste_mu_neg}
   \caption{Courbes théoriques et résultats des simuluations Monte Carlo pour différents cas de figure.
     \textbf{Haut} : source ponctuelle en 0 avec $\mu=0.5$ et $\Sigma_t=2$ pour $10^6$ particules avec une erreur $e_{L_2} = 3\,10^{-6}$. 18260 particules sont sorties du segment unitaire par la droite. 
     \textbf{Milieu} : source constante sur $[0,1]$ avec $\mu=0.5$ et $\Sigma_t=3$ pour $10^6$ particules avec une erreur $e_{L_2} = 3\,10^{-6}$.
@@ -232,7 +232,7 @@ On a donc en considérant un flux entrant nul à gauche
 Ces résultats sont visibles en \autoref{fig:cste_many_mu}, et les résultats des Monte-Carlo sont rassemblés en \autoref{fig:sigmacst}.
 \begin{figure}
   \centering
-  \includegraphics[height=.4\textheight]{../phi_source_cste_many_mu}
+  \includegraphics[height=.4\textheight]{phi_source_cste_many_mu}
   \caption{Fonctions $\Phi$ pour différent $\mu$.}
   \label{fig:cste_many_mu}
 \end{figure}
@@ -315,7 +315,7 @@ avec
 On trace le résultat de cette simulation pour $\mu=0.75$ en \autoref{fig:sigmavar}. Le résultat semble largement satisfaisant.
 \begin{figure}
   \centering
-  \includegraphics[height=.3\textheight]{../TP1_sigmavar}
+  \includegraphics[height=.3\textheight]{TP1_sigmavar}
   \caption{Courbes théorique et expérimentale pour une source ponctuelle en $x=0$, $\Sigma_t$ continu par morceaux, et $\mu=0.75$. On a une erreur de $10^{-4}$ pour $10^6$ particules lancées.}
   \label{fig:sigmavar}
 \end{figure}
@@ -346,15 +346,15 @@ tantque ( proba_abs>sigma_a/sigma_t ) {
 Des résultats de ce code pour différents types de source sont donnés en \autoref{fig:TP1_diff}. On trace aussi en \autoref{fig:nbjumps} la distribution du nombre de sauts par particules dans un système à source constante sur $[0,1]$. Cette répartition semble qualitativement être une exponentielle décroissant proportionnellement à $\Sigma_a/\Sigma_t$ et sensible au type de source (non tracé ici).
 \begin{figure}
   \centering
-  \includegraphics[height=.3\textheight]{../TP1_diff} \\
-  \includegraphics[height=.3\textheight]{../TP1_diff_delta}
+  \includegraphics[height=.3\textheight]{TP1_diff} \\
+  \includegraphics[height=.3\textheight]{TP1_diff_delta}
   \caption{Courbes expérimentales pour deux types de sources. Haut : source constante sur $[0,1]$, bas : source ponctuelle en 0. Lancer de $2\cdot10^6$ particules avec $\Sigma_a = 1, \Sigma_s = 5$.}
   \label{fig:TP1_diff}
 \end{figure}
 
 \begin{figure}
   \centering
-  \includegraphics[height=.3\textheight]{../TP1_diff_nb_jumps}
+  \includegraphics[height=.3\textheight]{TP1_diff_nb_jumps}
   \caption{Distribution du nombre de particules en fonction du nombre de sauts pour un lancer de $2\cdot10^6$ particules, avec $\Sigma_a = 1, \Sigma_s = 5$, et un source constante sur $[0,1]$.}
   \label{fig:nbjumps}
 \end{figure}
@@ -365,7 +365,7 @@ On étudie pour le cas simple sans diffusion à source ponctuelle en $0$ avec $\
 
 \begin{figure}
   \centering
-  \includegraphics[width=.8\textwidth]{../error_n_parts}
+  \includegraphics[width=.8\textwidth]{error_n_parts}
   \caption{Erreur entre solution exacte et solution approximée en fonction du nombre de particules.}
   \label{fig:vcv}
 \end{figure}
