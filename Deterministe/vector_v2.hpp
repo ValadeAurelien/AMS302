@@ -3,6 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <exception>
+#include <utility>
 
 /*
 ** Exception à renvoyer si les tailles ne 
@@ -33,6 +34,7 @@ public:
     vectorV2<T> operator*(T q) const;
     vectorV2<T> operator/(T q) const;
     double norm() const;
+    void flip();
 };
 
 template <typename T>
@@ -79,6 +81,14 @@ double vectorV2<T>::norm() const
     double sum = 0;
     for (auto const& v : (*this)) sum += pow(v, 2);
     return sum;
+}
+
+template<typename T>
+void vectorV2<T>::flip()
+{
+    size_t s = this->size();
+    for (int i=0; i<s/2; ++i) 
+	std::swap(this->at(i), this->at(s-1-i));
 }
 
 #endif

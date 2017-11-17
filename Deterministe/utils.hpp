@@ -74,10 +74,16 @@ int plot(const std::vector<Ty>& Y, const std::string& plot_opt = std::string(), 
     return pclose(pipe);
 }
 
-
 /*
-** Fonction d'intégration d'une fonction sur un segment
+** Fonctions d'intégration d'une fonction sur un segment
 */
+template<typename T>
+void get_gauss_lengendre_pts_wths(vector<T>& X, vector<T> W, unsigned N) {
+    X.resize(N);
+    Y.resize(N);
+    p_quadrature_rule(N, X.data(), Y.data());
+}
+
 template<typename T>
 double integ_gauss_legendre(const vectorV2<T>& Y,
 			    const vectorV2<double>& Weights) {

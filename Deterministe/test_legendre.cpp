@@ -17,10 +17,15 @@ v2d f_v2d(const v2d& X) {
 }
 
 int main(int argc, char **argv) {
-    int size = 100;
+    int size = 11;
     v2d t (size),
 	wts (size);
     p_quadrature_rule(size, t.data(), wts.data());
+    for (auto const& tt : t) cout << tt << " ";
+    cout << endl;
+    t.flip();
+    for (auto const& tt : t) cout << tt << " ";
+    cout << endl << endl;
     v2d Y = f_v2d(t);
     cout << integ_gauss_legendre(Y, wts) << endl;
 }
