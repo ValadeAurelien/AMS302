@@ -141,32 +141,6 @@ On peut remarquer que l'on retrouve exactement la même solution que si on avait
 
 \question{9.2}{Implémenter un solveur déterministe permettant d'évaluer le flux neutronique en chaque point de la géométrie. Ce solveur sera basé sur la méthode ``diamant'' pour la discrétisation spatiale.} 
 
-
-
-\subsection{Matériau homogène - source uniforme}
-
-\question{10}{Reprendre la démarche de la question 9 pour ces nouvelles conditions. On veillera à ce que les fonctionnalités
- ajoutées dans le solveur pour le traitement du terme source restent compatibles avec le traitement du flux entrant imposé nécessaire pour la question 9.}
- 
- \subsection{Matériau non homogène - courant entrant unitaire}
- 
- On se place maintenant dans le cas d'une source nulle et de conditions de flux entrant imposé, pour un matériau non homogène :
-\begin{equation}
-  \Sigma_a =
-  \begin{cases}
-    1 &\mbox{si } x<0.3 \\
-    3 &\mbox{si } 0.3<x<0.7 \\
-    1 &\mbox{si } 0.7<x \\
-  \end{cases}
-\end{equation}
-
-\question{11}{Reprendre la démarche de la question 9 pour ces nouvelles conditions.
-On s'attachera à ce que les fonctionnalités ajoutées pour le traitement de sections efficaces variables restent compatibles avec le reste du solveur tel que développé dans les questions précédentes.}
-
-\section{Matériau diffusant}
-
-\question{12}{Coucou}
-
 Voici la structure générale du code (prenant en compte la diffusion aussi, présentée pour $\mu>0$), pour une discrétisation en $N_x$ points en espace et $N_{\mu}$ en direction.
 
 \begin{itemize}
@@ -193,6 +167,24 @@ Voici la structure générale du code (prenant en compte la diffusion aussi, pr�
    \setlength\itemindent{0pt}
 \item[\textcolor{red}{\textbullet}] Fin tant que  
 \end{itemize}
+
+\subsection{Matériau homogène - source uniforme}
+
+\question{10}{Reprendre la démarche de la question 9 pour ces nouvelles conditions. On veillera à ce que les fonctionnalités
+ ajoutées dans le solveur pour le traitement du terme source restent compatibles avec le traitement du flux entrant imposé nécessaire pour la question 9.}
+ 
+ \subsection{Matériau non homogène - courant entrant unitaire}
+ 
+ On se place maintenant dans le cas d'une source nulle et de conditions de flux entrant imposé, pour un matériau non homogène :
+\begin{equation}
+  \Sigma_a =
+  \begin{cases}
+    1 &\mbox{si } x<0.3 \\
+    3 &\mbox{si } 0.3<x<0.7 \\
+    1 &\mbox{si } 0.7<x \\
+  \end{cases}
+\end{equation}
+
  
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
