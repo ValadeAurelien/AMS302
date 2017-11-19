@@ -6,9 +6,13 @@
 #include <string>
 #include <iostream>
 #include <cmath>
-#include "vector_v2.hpp"
+#include <Eigen/Eigen>
 #include "legendre_polynomial.hpp"
 
+using namespace std;
+using namespace Eigen;
+
+//typedef Matrix<double, Dynamic, 1> VectorXd;
 /* 
 ** La structure distrib regroupe les infos nécéssaire 
 ** à la structuration d'une distributions des particules
@@ -21,9 +25,13 @@ struct distrib_t
     distrib_t (const distrib_t& d) : below(d.below), above(d.above), segs(d.segs) {}
     float below,
 	above;
-    vectorV2<float> segs;
+    VectorXd segs;
 };
 
+struct size_exception : std::exception
+{
+    const char* what() const noexcept { return "Size(s) do(es) not match !"; }
+};
 /* 
 ** Fonction qui renvoie un entier entre 0 et 1
 */
@@ -36,40 +44,39 @@ float ranf()
 ** Analogue de la fonction de python (segmentation en n pts 
 ** du segment réel entre min et max)
 */
-template <typename T>
-vectorV2<T> linspace(float min, float max, unsigned nb_pts)
+VectorXd linspace(float min, float max, Index nb_pts)
 {
-    std::vector<T> X(nb_pts);
-    for (int i=0; i<nb_pts; i++) X[i] = (T) (min + i * (max-min) / nb_pts);
-    return X;
+    VectorXd X (nb_pts);
+    double dx = (max-min) / nb_pts;
+     for (int i=0; i<nb_pts; i++)
+     	X(i) = min + i * dx ;
+     return X;
 }
 
 /* 
 ** Fonctions de plot de 1 ou plusieurs vectors
 */
-template<typename Tx, typename Ty>
-int plot(const std::vector<Tx>& X, const std::vector<Ty>& Y, const std::string& plot_opt = std::string(), const std::string& pre_cmd = std::string())
+int plot(const VectorXd& X, const VectorXd& Y, const string& plot_opt = string(), const string& pre_cmd = string())
 {
     if (X.size() != Y.size()) {
-	std::cout << "sizes don't match !" << std::endl;
+	cout << "sizes don't match !" << endl;
 	return -1;
     }
     FILE *pipe = popen("gnuplot -p", "w");
     fprintf(pipe, ( pre_cmd + "plot '-' " + plot_opt + "\n" ).c_str());
     for (int i=0; i<X.size(); i++)
-	fprintf(pipe, "%f %f\n", (float) X.at(i), (float) Y.at(i));
+	fprintf(pipe, "%f %f\n", (float) X(i), (float) Y(i));
     fprintf(pipe, "pause -1;");
     fflush(pipe);
     return pclose(pipe);
 }
 
-template<typename Ty>
-int plot(const std::vector<Ty>& Y, const std::string& plot_opt = std::string(), const std::string& pre_cmd = std::string())
+int plot(const VectorXd& Y, const string& plot_opt = string(), const string& pre_cmd = string())
 {
     FILE *pipe = popen("gnuplot -p", "w");
     fprintf(pipe, ( pre_cmd + "plot '-' " + plot_opt + "\n" ).c_str());
     for (int i=0; i<Y.size(); i++)
-	fprintf(pipe, "%f\n", (float) Y.at(i));
+	fprintf(pipe, "%f\n", (float) Y(i));
     fflush(pipe);
     return pclose(pipe);
 }
@@ -77,23 +84,19 @@ int plot(const std::vector<Ty>& Y, const std::string& plot_opt = std::string(), 
 /*
 ** Fonctions d'intégration d'une fonction sur un segment
 */
-template<typename T>
-void get_gauss_lengendre_pts_wths(vector<T>& X, vector<T> W, unsigned N) {
-    X.resize(N);
-    Y.resize(N);
-    p_quadrature_rule(N, X.data(), Y.data());
+void get_gauss_lengendre_pts_wghts(VectorXd& X, VectorXd& W) {
+    p_quadrature_rule(X.rows(), X.data(), W.data());
 }
 
-template<typename T>
-double integ_gauss_legendre(const vectorV2<T>& Y,
-			    const vectorV2<double>& Weights) {
-    if ( Y.size() != Weights.size() )
+double integ_gauss_legendre(const VectorXd& Y,
+			    const VectorXd& Weights) {
+    if ( Y.rows() != Weights.rows() )
 	throw size_exception();
 
     double sum = 0;
     int size = Y.size();
     for (int i = 0; i < size; ++i)
-	sum += Y.at(i)*Weights.at(i);
+	sum += Y(i)*Weights(i);
     return sum;
 }
 #endif

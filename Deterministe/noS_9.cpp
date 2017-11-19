@@ -1,13 +1,12 @@
-#include <vector>
+#include <Eigen/Eigen>
 #include <fstream>
 #include <iostream>
 #include <cmath>
 #include <stdlib.h>
-#include "vector_v2.hpp"
-#include "utils.hpp"
 #include <stdexcept>
 
 using namespace std;
+typedef Evector<typename T> Eigen::Matrix<T, Eigen::Dynamic, 1>;
 
 // Deux types de source
 enum source_t
@@ -46,17 +45,17 @@ float Phi(float x, float mu, float sigma, source_t stype)
 }
 
 /* Phi déterministe */
-vectorV2<float> Phi_deter(int nb_segs, float mu, float sigma, source_t stype)
+Evector<float> Phi_deter(int nb_segs, float mu, float sigma, source_t stype)
 {
-    vectorV2<float> vec_deter(nb_segs+1,0);
+    Evector<float> vec_deter(nb_segs+1,0);
     switch(stype){
     case DELTA :
         if (mu>0) {
-            vec_deter.at(0) = 1./mu;
+            vec_deter(0) = 1./mu;
             float k   = sigma / (nb_segs * mu);
             float tau = (1. - k/2) / (1. + k/2);
 	    for (int i=1; i<nb_segs+1; i++)
-                vec_deter.at(i) = vec_deter.at(i-1) * tau;
+                vec_deter(i) = vec_deter(i-1) * tau;
         }
         return vec_deter;
     }
@@ -98,12 +97,12 @@ int main(int argc, char**argv)
     }
 
     // Courbe théorique
-    vectorV2<float> X = linspace(0, 1, nb_segs+1), // vecteurs des abscisses
+    Evector<float> X = linspace(0, 1, nb_segs+1), // vecteurs des abscisses
 	Py (nb_segs+1);                            // vecteurs de la probabilité théorique
     for (int i=0; i<nb_segs+1; i++)
 	Py.at(i) = Phi(X.at(i), mu, sigma, stype);
     // Courbe déterministe
-    vectorV2<float> Py_deter = Phi_deter(nb_segs, mu, sigma, stype);
+    Evector<float> Py_deter = Phi_deter(nb_segs, mu, sigma, stype);
 
     // Affichage
     if (output_style>2) {
@@ -113,7 +112,7 @@ int main(int argc, char**argv)
 	file << endl;
 	file << "#distrib" << endl << "#X     Phi(MC)     Phi(th)" << endl;
 	for (int i=0; i<nb_segs; i++)
-	    file << X.at(i) << " " << Py_deter.at(i) << " " << Py.at(i) << endl;
+	    file << X(i) << " " << Py_deter(i) << " " << Py(i) << endl;
 	file << "#diff normalized : " << (Py_deter-Py).norm()/Py.norm()
 	     << endl;
 	file.close();

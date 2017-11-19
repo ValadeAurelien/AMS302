@@ -1,0 +1,1 @@
+/usr/bin/g++  -O0 -g   CMakeFiles/solver_deter.dir/solver_deter.cpp.o CMakeFiles/solver_deter.dir/legendre_polynomial.cpp.o  -o solver_deter 
