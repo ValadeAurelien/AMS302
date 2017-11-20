@@ -234,10 +234,51 @@ Voici la structure générale du code (prenant en compte la diffusion aussi, pr�
  
  \section{Limite de diffusion}
  
-%\question{13.1}{Trouver l'équation vérifiée par $\phi_{\eps}$ lorsque $\eps$ tend vers 0.}
-%\question{13.2}{Dans le cas où on prend $\sigma_a = 0$ et $\sigma_t = 1$, trouver la limite de $\phi_\eps$ lorsque $\eps$ tend vers 0.}
-%\question{14}{e}
+ Nous nous intéressons maintenant au cas de matériaux très diffusants et peu absorbants, correspondants au problème suivant, caractérisé par un paramètre $\epsilon$ :
+ \begin{equation}
+  \begin{align}
+   &\Sigma_a(x) = \epsilon \sigma_a\\
+   &\Sigma_t(x) = \frac{\sigma_t}{\epsilon}\\
+   &\Sigma_s(x) = \frac{\sigma_t}{\epsilon} - \epsilon \sigma_a
+  \end{align}
+ \end{equation}
+ assorti d'une source uniforme $S = \epsilon$ et des conditions aux limites de flux entrant nul.
+ On note $\Phi_\epsilon$ la solution du problème\ref{eq:principal} dans ces conditions, et $\Phit_\epsilon$ le flux scalaire associé :
+ \begin{equation}
+  \forall x\in [0,1], \quad \Phit_\epsilon = \frac{1}{2} \int_{-1}^1 \Phi_\epsilon(x,\mu) d\mu .
+ \end{equation}
+ 
+\question{13.1}{Trouver l'équation vérifiée par $\Phi_\epsilon$ lorsque $\epsilon$ tend vers 0.}
 
+Selon ces hypothèses, l'équation se réécrit alors :
+\begin{equation}
+ \mu \frac{\partial \Phi_\epsilon}{\partial x} + \frac{\sigma_t}{\epsilon} \Phi_\epsilon =  \epsilon + \left(\frac{\sigma_t}{\epsilon} - \epsilon \sigma_a\right) \Phit_\epsilon .
+ \label{eq:eps}
+\end{equation}
+
+La présence du $\frac{1}{\epsilon}$ nous invite à supposer que l'on peut écrire :
+\begin{equation}
+ \Phi_\epsilon = \Phi_0 + \epsilon\Phi_1 + \epsilon^2 \Phi_2 + ... ,
+\end{equation}
+et de même pour $\Phit_\epsilon$.
+Puis, on pourra ensuite dissocier les termes de l'équation\ref{eq:eps} selon devant quelle puissance de $\epsilon$ ils se trouvent.
+Or, il reste un terme devant $\frac{1}{\epsilon}$, qui doit alors être nul :
+\begin{equation}
+ \sigma_t (\Phi_0(x,\epsilon) - \Phit_0(x)) = 0 \quad \Leftrightarrow \quad \Phi_0(x,\epsilon) = \frac{1}{2} \int_{-1}^1 \Phi_\epsilon(x,\mu) d\mu \quad \forall \mu \in [-1,1]
+\end{equation}
+
+Ensuite seulement, après avoir imposé cette dernière condition, il est possible de faire tendre $\epsilon$ vers 0, ce qui nous laisse le terme qui était devant la puissance $\epsilon^0$ :
+
+
+\question{13.2}{Dans le cas où on prend $\sigma_a = 0$ et $\sigma_t = 1$, trouver la limite de $\Phi_\epsilon$ lorsque $\epsilon$ tend vers 0.}
+\question{14.1}{Dans ce dernier cas, trouver la solution $\Phit_\epsilon$ avec votre code pour $\epsilon = 1, 0.1, 0.01$. Que peut-on constater ?}
+\question{14.2}{Donner le nombre d'itérations de la source itérée pour chaque valeur de $\epsilon$, que peut-on constater ?}
+\question{15.1}{En quoi la discrétisation en $\mu$ influence t-elle les résultats ?}
+\question{15.2}{En quoi la discrétisation en espace influence t-elle les résultats ?}
+\question{16.1}{Implémenter dans le code l'accélération par diffusion synthétique.}
+\question{16.2}{Répéter l'expérience de la question 14 ; que peut-on constater ?}
+\question{17.1}{Remplacer le schéma ``diamant'' par un schéma ``upwind''.}
+\question{17.2}{Reprendre la question 14 ; que peut-on constater ?}
  
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
