@@ -261,13 +261,26 @@ La présence du $\frac{1}{\epsilon}$ nous invite à supposer que l'on peut écri
  \Phi_\epsilon = \Phi_0 + \epsilon\Phi_1 + \epsilon^2 \Phi_2 + ... ,
 \end{equation}
 et de même pour $\Phit_\epsilon$.
-Puis, on pourra ensuite dissocier les termes de l'équation\ref{eq:eps} selon devant quelle puissance de $\epsilon$ ils se trouvent.
-Or, il reste un terme devant $\frac{1}{\epsilon}$, qui doit alors être nul :
+Puis, on pourra ensuite dissocier les termes de l'équation\ref{eq:eps} selon devant quelle puissance de $\epsilon$ ils se trouvent : chacun devra être nul.
+Le terme en facteur de $\frac{1}{\epsilon}$ est :
 \begin{equation}
- \sigma_t (\Phi_0(x,\epsilon) - \Phit_0(x)) = 0 \quad \Leftrightarrow \quad \Phi_0(x,\epsilon) = \frac{1}{2} \int_{-1}^1 \Phi_\epsilon(x,\mu) d\mu \quad \forall \mu \in [-1,1]
+ \sigma_t (\Phi_0(x,\mu) - \Phit_0(x)) = 0 \quad \Leftrightarrow \quad \Phi_0(x,\mu) = \Phit_0(x) \quad \forall \mu \in [-1,1]
+\end{equation}
+Nous n'utiliserons donc plus que $\Phi_0(x)$.
+
+Regardons ensuite tout d'abord le terme devant la puissance $\epsilon^1$, divisé par 2, et que l'on intègre sur $\mu$ entre -1 et 1 :
+
+\begin{equation}
+ \frac{1}{2}\int_{-1}^1 \left[ \mu \dx{\Phi_1} + \sigma_t (\Phi_2(x,\mu) - \Phit_2(x)) + \sigma_a \Phit_0(x) -1 \right] d\mu
+ = \sigma_a \Phi_0(x) -1 + \textcolor{red}{\frac{1}{2}\int_{-1}^1  \mu \dx{\Phi_1} d\mu} \quad = 0.
+\end{equation}
+Le dernier terme de droite donne l'idée d'intégrer le terme devant le facteur $\epsilon^0$ en premier lieu multiplié par $\mu$ :
+\begin{equation}
+ \frac{1}{2} \int_{-1}^1 \mu^2 \dx{\Phi_0(x)} d\mu + \textcolor{red}{\sigma_t \times \frac{1}{2}\int_{-1}^1  \mu \Phi_1 d\mu} - 0
+ \quad = \quad \frac{1}{3} \dx{\Phi_0} + \sigma_t \times \frac{1}{2}\int_{-1}^1  \mu \Phi_1 d\mu
+ \quad = \quad 0
 \end{equation}
 
-Ensuite seulement, après avoir imposé cette dernière condition, il est possible de faire tendre $\epsilon$ vers 0, ce qui nous laisse le terme qui était devant la puissance $\epsilon^0$ :
 
 
 \question{13.2}{Dans le cas où on prend $\sigma_a = 0$ et $\sigma_t = 1$, trouver la limite de $\Phi_\epsilon$ lorsque $\epsilon$ tend vers 0.}
@@ -280,6 +293,12 @@ Ensuite seulement, après avoir imposé cette dernière condition, il est possib
 \question{17.1}{Remplacer le schéma ``diamant'' par un schéma ``upwind''.}
 \question{17.2}{Reprendre la question 14 ; que peut-on constater ?}
  
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  
