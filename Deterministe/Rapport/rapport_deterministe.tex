@@ -121,6 +121,7 @@ L'équation à résoudre s'écrit alors :
     \Phi(0,\mu) = \frac{1}{\mu} & \forall \mu \in [0,1] \medskip\\
     \Phi(1,\mu) = 0 & \forall \mu \in [-1,0]
   \end{cases}
+  \label{eq:pasdiff}
 \end{equation}
 
 La solution est donc :
@@ -137,17 +138,52 @@ avec $A(\mu)$ qui vérifie les conditions initiales :
  \end{cases}
 \end{equation}
 
-On peut remarquer que l'on retrouve exactement la même solution que si on avait imposé un flux entrant nul des deux côtés et une source sous forme de dirac lorsque $\mu>0$.
+On peut remarquer que l'on retrouve exactement la même solution que si l'on avait imposé un flux entrant nul des deux côtés, et une source sous forme de dirac en 0 lorsque $\mu>0$.
 
 \question{9.2}{Implémenter un solveur déterministe permettant d'évaluer le flux neutronique en chaque point de la géométrie. Ce solveur sera basé sur la méthode ``diamant'' pour la discrétisation spatiale.} 
 
+\paragraph{Notations :} On note par $(x_i)$ la segmentation choisie pour $[0,1]$, $I_i = [x_i,x_{i+1}]$ et $\delta_i = x_{i+1} - x_i$.
+On peut alors écrire $\phi_i( \mu) = \phi(x_i,\mu)$.
+La méthode ``diamant'' fait l'hypothèse suivante :
 
+\begin{equation}
+ \forall (\mu,x) \in [-1,1]\times I_i, \quad \phi(x,\mu) \simeq \frac{\phi_i(\mu) + \phi_{i+1}(\mu)}{2} .
+\end{equation}
+Pour simplifier les expressions suivantes, on se fixe un $\mu \in  [-1,1]$ et on écrit directement $\phi_i(\mu) = \phi_i$.
+De là, l'équation~\ref{eq:pasdiff} devient (on rajoute un terme source $S$ pour ne pas avoir à refaire les calculs pour la prochaine question) :
+
+\begin{equation}
+\begin{align}
+ & \mu \frac{\phi_{i+1}-\phi_i}{\Delta_i} + \Sigma_t \frac{\phi_{i+1}+\phi_i}{2} = S\\
+ \Leftrightarrow \quad & 2 \mu (\phi_{i+1}- \phi_i) + \Delta_i \Sigma_t (\phi_{i+1}+\phi_i) = 2 \Delta_i S\\
+ \Leftrightarrow \quad & \eta^+ \phi_{i+1} - \eta^- \phi_i = 2 \Delta_i S &&  \text{avec } \eta^{\pm} = 2 \mu \pm \Delta_i \Sigma_t .
+ \end{align}
+\end{equation}
+
+Or, suivant le signe de $\mu$, on n'isolera pas le même terme dans cette équation.
+En effet, si $\mu>0$, les conditions de flux entrant ne donnent une information qu'en $x=0$ : il faut donc utiliser cette relation récurrente afin d'avoir $\phi_{i+1}$ à partir de $\phi_i$, ce qui donne :
+\begin{equation}
+ \phi_{i+1} = \frac{\eta^- \phi_i + 2 \Delta_i S}{\eta^+}
+ \label{eq:recu}
+\end{equation}
+
+Et inversement lorsque $\mu<0$.
+De plus on remarque que :
+\begin{equation}
+ \frac{\eta^+}{\eta^-} = \frac{- \eta^+}{-\eta^-} = \frac{-2 \mu - \Delta_i \Sigma_t}{-2 \mu + \Delta_i \Sigma_t} = \frac{2 |\mu| - \Delta_i \Sigma_t}{2 |\mu| + \Delta_i \Sigma_t} ,
+\end{equation}
+
+donc si l'on change la définition des $\eta$ en $\eta^{\pm} = 2|\mu| \pm \Delta_i \Sigma_t$, on retrouve pour $\mu<0$ la même formulation~\ref{eq:recu} que pour $\mu>0$ :
+\begin{equation}
+ \phi_i = \frac{\eta^- \phi_{i+1} + 2 \Delta_i S}{\eta^+} .
+\end{equation}
+Il faut simplement faire attention à bien retourner le vecteur $(\phi_i)$.
 
 \subsection{Matériau homogène - source uniforme}
 
 \question{10}{Reprendre la démarche de la question 9 pour ces nouvelles conditions. On veillera à ce que les fonctionnalités
  ajoutées dans le solveur pour le traitement du terme source restent compatibles avec le traitement du flux entrant imposé nécessaire pour la question 9.}
- 
+ Coucou
  \subsection{Matériau non homogène - courant entrant unitaire}
  
  On se place maintenant dans le cas d'une source nulle et de conditions de flux entrant imposé, pour un matériau non homogène :
@@ -165,7 +201,9 @@ On s'attachera à ce que les fonctionnalités ajoutées pour le traitement de se
 
 \section{Matériau diffusant}
 
-\question{12}{Coucou}
+\question{12}{Reprendre la démarche de la question 9 pour traiter ce problème de diffusion.
+Le solveur utilisera la méthode des ordonnées discrètes ($S_N$) pour traiter la variable angulaire $\mu$.
+Il n'y a pas de solution analytique dans ce cas ; on s'attachera donc tout particulièrement à la vérification du solveur déterministe par comparaison aux résultats donnés par le solveur Monte Carlo développé au TP1.}
 
 Voici la structure générale du code (prenant en compte la diffusion aussi, présentée pour $\mu>0$), pour une discrétisation en $N_x$ points en espace et $N_{\mu}$ en direction.
 
@@ -181,7 +219,7 @@ Voici la structure générale du code (prenant en compte la diffusion aussi, pr�
 \item $\Phi^- = 0$
 \item[\textcolor{red}{\textbullet}] Pour $i\in[1, N_x-1]$
   \setlength\itemindent{105pt}
-\item $\Phi^+ = \frac{2 \Delta i Q_i^1 + (2 |\mu_k| - \Delta \Sigma_{t,i}) \Phi^-}{2 |\mu_k| + \Delta \Sigma_{t,i}}$
+\item $\Phi^+ = \frac{\eta^- \Phi^- + 2 \Delta_i S}{\eta^+}$
 \item $\Phit_i =  \Phit_i + \frac{1}{2} w_k (\Phi^+ + \Phi^-)$
 \item $\Phi^- = \Phi^+$
   \setlength\itemindent{70pt}
@@ -193,6 +231,13 @@ Voici la structure générale du code (prenant en compte la diffusion aussi, pr�
    \setlength\itemindent{0pt}
 \item[\textcolor{red}{\textbullet}] Fin tant que  
 \end{itemize}
+ 
+ \section{Limite de diffusion}
+ 
+%\question{13.1}{Trouver l'équation vérifiée par $\phi_{\eps}$ lorsque $\eps$ tend vers 0.}
+%\question{13.2}{Dans le cas où on prend $\sigma_a = 0$ et $\sigma_t = 1$, trouver la limite de $\phi_\eps$ lorsque $\eps$ tend vers 0.}
+%\question{14}{e}
+
  
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
