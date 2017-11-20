@@ -88,6 +88,13 @@ void get_gauss_lengendre_pts_wghts(VectorXd& X, VectorXd& W) {
     p_quadrature_rule(X.rows(), X.data(), W.data());
 }
 
+void get_cst_pts_wghts(VectorXd& X, VectorXd&W) {
+    int size = X.rows();
+    double dx = 1./size;
+    X = linspace(0, 1, size);
+    for (int i=0; i<size; ++i) W(i) = 2*dx;
+}
+
 double integ_gauss_legendre(const VectorXd& Y,
 			    const VectorXd& Weights) {
     if ( Y.rows() != Weights.rows() )

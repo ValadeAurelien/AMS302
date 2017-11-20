@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <stdexcept>
 #include "utils.hpp"
+#include "fe1D_solver.hpp"
+
 #define WIDTH 15
 #define PRECISION 5
 #define MAX_COUNT 1000
@@ -123,7 +125,10 @@ struct phi_func_t {
     }
 };
 
-/* Phi déterministe */
+
+
+
+/* Phi déterministe avec diffusion */
 VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
 		       sigma_func_t& sigma_a_func, sigma_func_t& sigma_s_func,
 		       source_func_t& source_func,
@@ -132,34 +137,71 @@ VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
 	Q = X.unaryExpr(source_func),
 	Qt = Q,
 	phi(nb_pts),
+	phit(nb_pts),
 	vec_mus (nb_pts_mu),
 	weights (nb_pts_mu);
     double phip, phim, eta_m, eta_p,
-	x, dx = (double) 1/nb_pts;
-    int count = 0;
+	x = 0,
+	dx = (double) 1/nb_pts;
+    int count = 0,
+	nmu;
     get_gauss_lengendre_pts_wghts(vec_mus, weights);
+    //get_cst_pts_wghts(vec_mus, weights);
     do {
+	phi.fill(0);
 	if (count++ > MAX_COUNT) {
 	    cout << "norm & eps : " << (Qt-Q).norm()
 		 << " " << epsilon << " " << endl;
 	    cout.flush();				      
 	    throw range_error("Could not converge...");
 	}
-	for (int nmu = 0; nmu<nb_pts_mu; ++nmu) {
+	for (nmu=0; nmu<nb_pts_mu/2; ++nmu) {
+	    switch (source_func.sourcet) {
+	    case DELTA:
+		continue;
+		break;
+	    case CSTE:
+		eta_m = (sigma_a_func(1)+sigma_a_func(1)) / 2. - vec_mus(nmu) * nb_pts; 
+		phip = 1/eta_m;                     
+		break;
+	    }
+	    x=1;
+	    for (int nx=nb_pts-1; nx>=0; --nx) {
+		eta_m = 2*abs(vec_mus(nmu)) -
+		    dx*(sigma_a_func(x)+sigma_s_func(x));
+		eta_p = 2*abs(vec_mus(nmu)) +
+		    dx*(sigma_a_func(x)+sigma_s_func(x));
+		phim = (2*dx*Q(nx) + eta_m * phip) / eta_p;
+		phi(nx) += 1/2.*weights(nmu)*(phip+phim);
+		phip = phim;
+		x -= dx;
+	    }
+	}
+	for (nmu=nmu; nmu<nb_pts_mu; ++nmu) {
 	    if (vec_mus(nmu)==0)
 		continue;
-	    phim = 0;
-	    for (int nx = 0; nx<nb_pts; ++nx) {
-		x = nx*dx;
-		eta_m = abs(vec_mus(nmu)) -
-		    dx*(sigma_a_func(x)+sigma_s_func(x))/2;
-		eta_p = abs(vec_mus(nmu)) +
-		    dx*(sigma_a_func(x)+sigma_s_func(x))/2;
-		phip = (dx*Q(nx) + eta_m * phim) / eta_p;
+	    switch (source_func.sourcet) {
+	    case DELTA: 
+		phim=1/vec_mus(nmu);
+		break;
+	    case CSTE:
+		phim=0;
+		break;
+	    }
+	    x=0;
+	    for (int nx=0; nx<nb_pts; ++nx) {
+		eta_m = 2*abs(vec_mus(nmu)) -
+		    dx*(sigma_a_func(x)+sigma_s_func(x));
+		eta_p = 2*abs(vec_mus(nmu)) +
+		    dx*(sigma_a_func(x)+sigma_s_func(x));
+		phip = (2*dx*Q(nx) + eta_m * phim) / eta_p;
 		phi(nx) += 1/2.*weights(nmu)*(phip+phim);
 		phim = phip;
+		x += dx;
 	    }
-	}	
+	}
+	// cout << phi-phit << endl << endl;
+	// phit = phi;
 	Qt = Q;
 	Q = X.unaryExpr(source_func) + sigma_s_func(0)/2. * phi;
     } while ((Qt-Q).norm()>epsilon);
@@ -293,7 +335,7 @@ int main(int argc, char**argv) {
 	Py_deter = Phi_deter(nb_pts, mu, sigma_a_func, source_func);
 	break;
     case SCATTERING:
-	Py  = X.unaryExpr(phi_func), // vecteurs de la probabilité théorique
+	//Py  = X.unaryExpr(phi_func), // vecteurs de la probabilité théorique
 	Py_deter = Phi_deter_many_mu(nb_pts, nb_pts_mu, sigma_a_func,   // Courbe déterministe
 				     sigma_s_func, source_func,
 				     epsilon);

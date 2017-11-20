@@ -6,6 +6,14 @@
 
 #IncludeRegexTransform: 
 
+/home/aurelien/Code/C++/M2/AMS302/Deterministe/fe1D_solver.hpp
+Eigen/Eigen
+-
+iostream
+-
+utils.hpp
+/home/aurelien/Code/C++/M2/AMS302/Deterministe/utils.hpp
+
 /home/aurelien/Code/C++/M2/AMS302/Deterministe/legendre_polynomial.cpp
 cmath
 -
@@ -43,6 +51,8 @@ stdexcept
 -
 utils.hpp
 /home/aurelien/Code/C++/M2/AMS302/Deterministe/utils.hpp
+fe1D_solver.hpp
+/home/aurelien/Code/C++/M2/AMS302/Deterministe/fe1D_solver.hpp
 
 /home/aurelien/Code/C++/M2/AMS302/Deterministe/utils.hpp
 vector

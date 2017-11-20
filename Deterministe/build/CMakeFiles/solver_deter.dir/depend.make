@@ -4,6 +4,7 @@
 CMakeFiles/solver_deter.dir/legendre_polynomial.cpp.o: ../legendre_polynomial.cpp
 CMakeFiles/solver_deter.dir/legendre_polynomial.cpp.o: ../legendre_polynomial.hpp
 
+CMakeFiles/solver_deter.dir/solver_deter.cpp.o: ../fe1D_solver.hpp
 CMakeFiles/solver_deter.dir/solver_deter.cpp.o: ../legendre_polynomial.hpp
 CMakeFiles/solver_deter.dir/solver_deter.cpp.o: ../solver_deter.cpp
 CMakeFiles/solver_deter.dir/solver_deter.cpp.o: ../utils.hpp
