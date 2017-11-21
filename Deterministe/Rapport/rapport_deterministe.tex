@@ -23,12 +23,13 @@
 \newcommand{\dx}[1]{\dfrac{\partial #1}{\partial x}}
 \newcommand{\norm}[1]{\big|\big|#1\big|\big|}
 \newcommand{\question}[2]{\paragraph{Question #1 --}\hspace{-7pt}\textit{#2} \\}
+\newcommand{\questions}[2]{\paragraph{Questions #1 --}\hspace{-7pt}\textit{#2} \\}
 \newcommand{\tphi}{\widetilde{\Phi}}
 \newcommand{\intsigma}{\widetilde{\Sigma}}
 \newcommand{\F}{\mathcal{F}}
 \newcommand{\Qt}{\widetilde{Q}}
 \newcommand{\Phit}{\widetilde{\Phi}}
-
+\makeatletter \def\input@path{{Graphics/}} \makeatother
 
 \begin{document}
 
@@ -184,7 +185,7 @@ Il faut simplement faire attention à bien retourner le vecteur $(\phi_i)$.
 
 \question{10}{Reprendre la démarche de la question 9 pour ces nouvelles conditions. On veillera à ce que les fonctionnalités
  ajoutées dans le solveur pour le traitement du terme source restent compatibles avec le traitement du flux entrant imposé nécessaire pour la question 9.}
- Coucou
+
  \subsection{Matériau non homogène - courant entrant unitaire}
  
  On se place maintenant dans le cas d'une source nulle et de conditions de flux entrant imposé, pour un matériau non homogène :
@@ -297,8 +298,43 @@ D'après la question précédente, dans ce cas l'équation vérifiée est :
 Les solutions de cette équation sont de la forme $\Phi_0(x) = -\frac{3}{2}x^2 + a x +b$, avec $a$ et $b$ des constantes à déterminer avec les conditions aux limites : on sait que $\Phi_0(0,\mu >0) = \Phi_0(1,\mu <0) = 0$.
 Or, $\Phi_0(x,\mu) = \Phi_0(x) \quad \forall \mu \in [-1,1]$, donc cela nous permet de conclure sur $\Phi_0(x) = \frac{3}{2}x(1-x)$.
 
-\question{14.1}{Dans ce dernier cas, trouver la solution $\Phit_\epsilon$ avec votre code pour $\epsilon = 1, 0.1, 0.01$. Que peut-on constater ?}
-\question{14.2}{Donner le nombre d'itérations de la source itérée pour chaque valeur de $\epsilon$, que peut-on constater ?}
+\questions{14 et 16}{Dans ce dernier cas, trouver la solution $\Phit_\epsilon$ avec votre code pour $\epsilon = 1, 0.1, 0.01$. Donner le nombre d'itérations de la source itérée pour chaque valeur de $\epsilon$. Que peut-on constater ?}
+
+Ci-dessous se trouve un tableau donnant le nombre d'itérations nécessaires à la convergence ($\norm{Q_1 - Q_0}>10^{-3}$, voir l'algorithme de la question 12), pour chaque valeur de $\epsilon$, et avec ou sans accélération par diffusion synthétique.
+Une expérience n'aura pas convergé si la condition de convergence n'est toujours pas remplie au bout de 10000 itérations (équivalant à environ 40s).
+Dans ce cas, ce ne sera pas le nombre d'itérations mais la valeur de $\norm{Q_1 - Q_0}$ qui sera présentée dans le tableau.
+
+\begin{tabular}{|l|c|c|c|}
+  \hline
+  & $\epsilon = 1$ & $\epsilon=0.1$ & $\epsilon=0.01$ \\
+  \hline\hline
+  \textit{sans} DSA & 1.1 & 1.2 & 1.3 \\
+  \textit{avec} DSA & 2.1 & 2.2 & 2.3 \\
+  \hline
+\end{tabular}
+
+\include{loop_nb_pts_mu_delta.tex}
+\include{output_1_neg1_5_1.tex}
+\include{loop_nb_pts_mu_cste.tex}
+\include{output_1_1_5_1.tex}
+\include{output_two_steps_1_1_1_2.tex}
+\include{output_1_05_5_2.tex}
+\include{output_two_steps_1_05_3_2.tex}
+\include{output_two_steps_1_05_1_2.tex}
+\include{nb_segs_diff_L2_delta.tex}
+\include{nb_segs_diff_L2_cste.tex}
+
+%\include{loop_nb_pts_mu_delta}
+%\include{output_1_neg1_5_1}
+%\include{loop_nb_pts_mu_cste}
+%\include{output_1_1_5_1}
+%\include{output_two_steps_1_1_1_2}
+%\include{output_1_05_5_2}
+%\include{output_two_steps_1_05_3_2}
+%\include{output_two_steps_1_05_1_2}
+%\include{nb_segs_diff_L2_delta}
+%\include{nb_segs_diff_L2_cste}
+
 \question{15.1}{En quoi la discrétisation en $\mu$ influence t-elle les résultats ?}
 \question{15.2}{En quoi la discrétisation en espace influence t-elle les résultats ?}
 \question{16.1}{Implémenter dans le code l'accélération par diffusion synthétique.}
