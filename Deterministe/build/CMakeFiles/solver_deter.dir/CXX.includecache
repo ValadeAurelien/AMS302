@@ -11,6 +11,8 @@ Eigen/Eigen
 -
 iostream
 -
+iomanip
+-
 utils.hpp
 /home/aurelien/Code/C++/M2/AMS302/Deterministe/utils.hpp
 
@@ -44,6 +46,8 @@ iostream
 iomanip
 -
 cmath
+-
+ctime
 -
 stdlib.h
 -

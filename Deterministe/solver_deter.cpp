@@ -3,6 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <ctime>
 #include <stdlib.h>
 #include <stdexcept>
 #include "utils.hpp"
@@ -10,7 +11,7 @@
 
 #define WIDTH 15
 #define PRECISION 5
-#define MAX_COUNT 1000
+#define MAX_COUNT 10000
 //using namespace std;
 //using namespace Eigen;
 
@@ -28,7 +29,8 @@ enum output_t {
 
 enum expe_type_t {
     NO_SCATTERING = 1,
-    SCATTERING = 2
+    SCATTERING = 2,
+    SCATTERING_DSA = 3
 };
 
 /* Terme source, suivant qu'il est uniforme (typ_source vrai)
@@ -64,9 +66,9 @@ struct sigma_func_t {
 	case CSTE:
 	    return arg1;
 	case TWO_STEPS:
-	    if (x<0.33)
+	    if (x<0.3)
 		return arg1;
-	    if (x<0.66)
+	    if (x<0.7)
 		return 3*arg1;
 	    else
 		return arg1;
@@ -125,35 +127,70 @@ struct phi_func_t {
     }
 };
 
+struct DSA_solver_t {
+    const sigma_func_t& sigma_a_func,
+	&sigma_s_func;
+    VectorXd& dQ,
+	&f, sdQ;
+    FE1DSolver_t FE1DSolver;
 
+    DSA_solver_t(const sigma_func_t& _saf, const sigma_func_t& _ssf,
+		 VectorXd& _dQ, VectorXd& _f)
+	: sigma_a_func(_saf), sigma_s_func(_ssf), dQ(_dQ), f(_f),
+	  FE1DSolver ( f.rows(), sigma_a_func(0),
+		       1/(3.*sigma_s_func(0)+sigma_a_func(0)) )	{
+    }
 
+    void init() {
+	FE1DSolver.init();
+    }
+
+    int solve() {
+	sdQ = sigma_s_func(0)*dQ;
+	FE1DSolver.setRightHand(sdQ);
+	FE1DSolver.solve(f);
+    }
+};		     
 
 /* Phi déterministe avec diffusion */
 VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
-		       sigma_func_t& sigma_a_func, sigma_func_t& sigma_s_func,
-		       source_func_t& source_func,
-		       double epsilon) {
-    VectorXd X = linspace(0,1,nb_pts),
+			   sigma_func_t& sigma_a_func, sigma_func_t& sigma_s_func,
+			   source_func_t& source_func,
+			   double epsilon, bool DSA) {
+    VectorXd X = linspacePts(0,1,nb_pts),
 	Q = X.unaryExpr(source_func),
 	Qt = Q,
-	phi(nb_pts),
-	phit(nb_pts),
+	dQ = Q-Qt,
+	phi (nb_pts),
+	phit (nb_pts),
+	f_DSA (nb_pts),
+	f_DSAt (nb_pts),
 	vec_mus (nb_pts_mu),
 	weights (nb_pts_mu);
     double phip, phim, eta_m, eta_p,
 	x = 0,
-	dx = (double) 1/nb_pts;
+	dx = (double) 1/(nb_pts-1);
     int count = 0,
 	nmu;
+    DSA_solver_t DSA_Solver (sigma_a_func, sigma_s_func, dQ, f_DSA);
+    if (DSA)
+	DSA_Solver.init();
+	
     get_gauss_lengendre_pts_wghts(vec_mus, weights);
     //get_cst_pts_wghts(vec_mus, weights);
+    clock_t timer = clock();
     do {
 	phi.fill(0);
 	if (count++ > MAX_COUNT) {
-	    cout << "norm & eps : " << (Qt-Q).norm()
+	    cout << "norm & eps : " << dQ.norm()
 		 << " " << epsilon << " " << endl;
 	    cout.flush();				      
 	    throw range_error("Could not converge...");
+	}
+	if (! (count%100) ) {
+	    cout << "\r#Nb loops : " << setw(5) << count
+		 << " et |dQ| = " << setw(7) << setprecision(4) << dQ.norm();
+	    cout.flush();
 	}
 	for (nmu=0; nmu<nb_pts_mu/2; ++nmu) {
 	    switch (source_func.sourcet) {
@@ -161,8 +198,7 @@ VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
 		continue;
 		break;
 	    case CSTE:
-		eta_m = (sigma_a_func(1)+sigma_a_func(1)) / 2. - vec_mus(nmu) * nb_pts; 
-		phip = 1/eta_m;                     
+		phip = 0;                     
 		break;
 	    }
 	    x=1;
@@ -200,11 +236,25 @@ VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
 		x += dx;
 	    }
 	}
-	// cout << phi-phit << endl << endl;
-	// phit = phi;
 	Qt = Q;
 	Q = X.unaryExpr(source_func) + sigma_s_func(0)/2. * phi;
-    } while ((Qt-Q).norm()>epsilon);
+	dQ = Q-Qt;
+	if (DSA) {
+	    f_DSAt = f_DSA;
+	    try { DSA_Solver.solve(); }
+	    catch (no_convergence& e) {
+		cout << "After " << count << " iterations" << endl;
+		throw e;
+	    }
+	    Q += 1./2*(f_DSAt + f_DSA);
+	    dQ = Q-Qt;
+	}
+    } while (dQ.norm()>epsilon);
+    timer = clock() - timer;
+    cout << endl << "#Exited loop after "
+	 << setw(5) << count << " iterations in "
+	 << setw(7) << setprecision(4) << (double) timer/CLOCKS_PER_SEC << "sec with |dQ| = "
+	 << setw(7) << setprecision(4) << dQ.norm() << endl;
     return phi;
 }
 
@@ -238,8 +288,7 @@ VectorXd Phi_deter(int nb_pts, double mu,
 	    for (int i=1; i<nb_pts; i++) { phi(i) = 0; }
 	    break;
 	case CSTE :
-	    eta_m = sigma_t_func(1) / 2. - mu * nb_pts; // la valeur est celle à gauche de chaque intervalle
-	    phi(nb_pts-1)= 1/eta_m;                     // donc phi(n-1) = phi(0.99) =\= phi(1)
+	    phi(nb_pts-1)= 0;                    
 	    for (int i=nb_pts-2; i>=0; i--) {
 		x = i * dx;
 		eta_p = sigma_t_func(x) / 2. + mu * nb_pts;
@@ -279,7 +328,7 @@ int main(int argc, char**argv) {
     double sigma_s_arg1 = atof(argv[8]);
     double epsilon      = atof(argv[9]);
     int    sourcet      = atoi(argv[10]);
-    double source_arg1   = atof(argv[11]);
+    double source_arg1  = atof(argv[11]);
     int    output_style = atoi(argv[12]);
     if ( !mu ||
 	 !nb_segs ||
@@ -300,8 +349,12 @@ int main(int argc, char**argv) {
     Index nb_pts = nb_segs+1;
     switch(expe_type) {
     case NO_SCATTERING:
-	source_arg1=1/mu;
+	switch(sourcet) {
+	case DELTA:
+	    source_arg1=1/mu;
+	}
 	sigma_s_arg1=0;
+	break;
     }
     source_func_t source_func(sourcet,  source_arg1);
     sigma_func_t sigma_a_func(sigma_at, sigma_a_arg1);
@@ -317,6 +370,7 @@ int main(int argc, char**argv) {
     	}
     	break;
     case SCATTERING:
+    case SCATTERING_DSA:
 	eta_m = sigma_a_func(0.5)/2-2*1./nb_pts_mu*nb_pts;
     	if (eta_m>0) { //pas exactement la bonne formule avec la quadrature de gauss 
     	    cout << "eta_m positif : " << eta_m << endl;
@@ -326,19 +380,22 @@ int main(int argc, char**argv) {
     }
     
     // Courbe théorique
-    VectorXd X = linspace(0, 1, nb_pts);
+    VectorXd X = linspacePts(0, 1, nb_pts);
     VectorXd Py (nb_pts),
 	Py_deter(nb_pts);
+    bool DSA=false;
     switch(expe_type) {
     case NO_SCATTERING:
 	Py  = X.unaryExpr(phi_func), // vecteurs de la probabilité théorique
 	Py_deter = Phi_deter(nb_pts, mu, sigma_a_func, source_func);
 	break;
+    case SCATTERING_DSA:
+	DSA = true;
     case SCATTERING:
 	//Py  = X.unaryExpr(phi_func), // vecteurs de la probabilité théorique
 	Py_deter = Phi_deter_many_mu(nb_pts, nb_pts_mu, sigma_a_func,   // Courbe déterministe
 				     sigma_s_func, source_func,
-				     epsilon);
+				     epsilon, DSA);
 	break;
     default:
 	throw invalid_argument("Mauvais argument de type d'expérience");

@@ -44,15 +44,27 @@ float ranf()
 ** Analogue de la fonction de python (segmentation en n pts 
 ** du segment réel entre min et max)
 */
-VectorXd linspace(float min, float max, Index nb_pts)
+VectorXd linspaceSegs(float min, float max, Index nb_segs)
 {
-    VectorXd X (nb_pts);
-    double dx = (max-min) / nb_pts;
-     for (int i=0; i<nb_pts; i++)
+    VectorXd X (nb_segs);
+    double dx = (max-min) / nb_segs;
+     for (int i=0; i<nb_segs; i++)
      	X(i) = min + i * dx ;
      return X;
 }
 
+/*
+** Analogue de la fonction de python (segmentation en n pts 
+** du segment réel entre min et max)
+*/
+VectorXd linspacePts(float min, float max, Index nb_pts)
+{
+    VectorXd X (nb_pts);
+    double dx = (max-min) / (nb_pts-1);
+     for (int i=0; i<nb_pts; i++)
+     	X(i) = min + i * dx ;
+     return X;
+}
 /* 
 ** Fonctions de plot de 1 ou plusieurs vectors
 */
@@ -90,8 +102,8 @@ void get_gauss_lengendre_pts_wghts(VectorXd& X, VectorXd& W) {
 
 void get_cst_pts_wghts(VectorXd& X, VectorXd&W) {
     int size = X.rows();
-    double dx = 1./size;
-    X = linspace(0, 1, size);
+    double dx = 1./(size-1);
+    X = linspacePts(0, 1, size);
     for (int i=0; i<size; ++i) W(i) = 2*dx;
 }
 

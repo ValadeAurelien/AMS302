@@ -1,0 +1,61 @@
+#nb iterations for sigma_a = epsilon
+
+#0.1
+
+EXPE..........epsilon_abs
+expe_type.....2
+nb_segs.......200
+mu............1
+nb_pts_mu.....50
+sigma_at......1
+sigma_a_arg1..0.3
+sigma_st......1
+sigma_s_arg1..39.7
+epsilon.......1e-3
+sourcet.......1
+source_arg1...0.1
+output_style..0
+fname.........output_eps
+epsilon_abs : 2 200 1 50 1 0.3 1 39.7 1e-3 1 0.1 0 output_eps
+[100%] Built target solver_deter
+#Nb loops :   100 et |dQ| =  0.5116#Nb loops :   200 et |dQ| =  0.1988#Nb loops :   300 et |dQ| = 0.07748#Nb loops :   400 et |dQ| =  0.0302#Nb loops :   500 et |dQ| = 0.01177#Nb loops :   600 et |dQ| = 0.004586#Nb loops :   700 et |dQ| = 0.001787
+#Exited loop after   761 iterations in   2.948sec with |dQ| = 0.0009966
+
+EXPE..........epsilon_abs
+expe_type.....3
+nb_segs.......200
+mu............1
+nb_pts_mu.....50
+sigma_at......1
+sigma_a_arg1..0.3
+sigma_st......1
+sigma_s_arg1..39.7
+epsilon.......1e-3
+sourcet.......1
+source_arg1...0.1
+output_style..0
+fname.........output_eps
+epsilon_abs : 3 200 1 50 1 0.3 1 39.7 1e-3 1 0.1 0 output_eps
+[100%] Built target solver_deter
+
+#Exited loop after    32 iterations in  0.1499sec with |dQ| = 0.0006371
+
+#0.01
+
+EXPE..........epsilon_abs
+expe_type.....2
+nb_segs.......200
+mu............1
+nb_pts_mu.....50
+sigma_at......1
+sigma_a_arg1..0.03
+sigma_st......1
+sigma_s_arg1..399.97
+epsilon.......1e-3
+sourcet.......1
+source_arg1...0.01
+output_style..0
+fname.........output_eps
+epsilon_abs : 2 200 1 50 1 0.03 1 399.97 1e-3 1 0.01 0 output_eps
+[100%] Built target solver_deter
+#Nb loops :   100 et |dQ| =  0.1377#Nb loops :   200 et |dQ| =  0.1353#Nb loops :   300 et |dQ| =  0.1333#Nb loops :   400 et |dQ| =  0.1314#Nb loops :   500 et |dQ| =  0.1296#Nb loops :   600 et |dQ| =   0.128#Nb loops :   700 et |dQ| =  0.1264
