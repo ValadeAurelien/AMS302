@@ -187,25 +187,9 @@ Pour les courbes, se reporter à la question 10.
 \question{10}{Reprendre la démarche de la question 9 pour ces nouvelles conditions. On veillera à ce que les fonctionnalités
  ajoutées dans le solveur pour le traitement du terme source restent compatibles avec le traitement du flux entrant imposé nécessaire pour la question 9.}
 
-Les deux fonctionnalités du code sont compatibles, le cas général d'une source sous forme d'une fonction de $x$ étant utilisée\footnote{De même pour les différents coefficients de diffusion bien que la méthode de résolution ne soit pas systématiquement adaptée !!!}. Il faut cependant veiller aux conditions intiales qui ne sont pas forcément les mêmes. Cette méthode de résolution nous a fournis les résultats que l'ont peut voir en \autoref{fig:exple_a}, \autoref{fig:exple_b} et \autoref{fig:exple_c}. Dans tous ces exemples on a $N_x=10^{3}$ et une erreur relative de l'ordre de $10^{-3}$. On peut en effet noter que les deux courbes tracées dans chaque figures sont complètement confondues. 
-
-\begin{figure}
-  \centering
-  \include{output_1_neg1_5_1}
-  \caption{Exemple de résultat du solveur ``diamant'' pour un cas sans diffusion, $\mu=-1, \sigma=5$ et un source constante sur $[0,1]$.}
-  \label{fig:exple_a}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \include{output_1_1_5_1}
-  \caption{Exemple de résultat du solveur ``diamant'' pour un cas sans diffusion, $\mu=1, \sigma=5$ et un source constante sur $[0,1]$.}
-  \label{fig:exple_b}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \include{output_1_05_5_2}
+Les deux fonctionnalités du code sont compatibles, le cas général d'une source sous forme d'une fonction de $x$ étant utilisée\footnote{De même pour les différents coefficients de diffusion bien que la méthode de résolution ne soit pas systématiquement adaptée !!!}. Il faut cependant veiller aux conditions intiales qui ne sont pas forcément les mêmes. Cette méthode de résolution nous a fournis les résultats que l'ont peut voir en \autoref{fig:exple_a}, \autoref{fig:exple_b} et \autoref{fig:exple_c}. Dans tous ces exemples on a $ '((((((((((((((n
+$
+b\include{output_1_05_5_2}
   \caption{Exemple de résultat du solveur ``diamant'' pour un cas sans diffusion, $\mu=0.5, \sigma=5$ et un source de la forme $\delta(0)$.}
   \label{fig:exple_c}
 \end{figure}
@@ -251,7 +235,7 @@ Encore une fois, la partie principale du code déterministe ne fait pas la diff�
 
 \question{12}{Reprendre la démarche de la question 9 pour traiter ce problème de diffusion.
 Le solveur utilisera la méthode des ordonnées discrètes ($S_N$) pour traiter la variable angulaire $\mu$.
-Il n'y a pas de solution analytique dans ce cas ; on s'attachera donc tout particulièrement à la vérification du solveur déterministe par comparaison aux résultats donnés par le solveur Monte Carlo développé au TP1.}
+Il n'y a pas de solution analytique dans ce cas ; on s'attachera donc tout particulièrement à la vérification du solveur déterministe par comparaison aux résultats donnés par le solveur Monte Carlo développé au~TP1.}
 
 Voici la structure générale du code (prenant en compte la diffusion aussi, présentée pour $\mu>0$), pour une discrétisation en $N_x$ points en espace et $N_{\mu}$ en direction.
 
@@ -358,7 +342,7 @@ Nous avons mis en place la méthode DSA comme indiquée dans le cours. Pour cela
 \item le gradient conjugué ;
 \item une méthode de Cholesky dite LLTD ;
 \end{enumerate}
-le choix s'étant porté sur le solveur directe 2, environ dix fois plus rapide. L'utilisation de la méthode DSA permet en effet de bien meilleurs résultats : le nombre d'itérations et donc le temps de calcul sont fortement réduits comme on peut le voir dans les valeurs reportées dans le \autoref{tab:DSA}. 
+le choix s'étant porté sur le solveur direct 2, environ dix fois plus rapide. L'utilisation de la méthode DSA permet en effet de bien meilleurs résultats : le nombre d'itérations et donc le temps de calcul sont fortement réduits comme on peut le voir dans les valeurs reportées dans le \autoref{tab:DSA}. 
 
 \begin{table}
   \centering
@@ -382,12 +366,12 @@ le choix s'étant porté sur le solveur directe 2, environ dix fois plus rapide.
 
 \question{15.1}{En quoi la discrétisation en $\mu$ influence t-elle les résultats ?}
 
-La discrétisation de $\mu$ s'est faite dans notre cas avec une quadrature de Gauss-Legendre. Une discrétisation à $N_\mu$ points est donc censée pouvoir intégrer exactement un polynôme de drgré $2N_\mu+1$. Or, vu la continuité des fonctions en présence, l'intégration est donc rapidement exacte. C'est en effet ce que l'on peut observer dans les \autoref{fig:lm_d} et \autoref{fig:lm_c} ou les courbes sont les mêmes quand $N_\mu$ dépasse la dizaine. On observe cependant que la convergence se fait plus vite pour une source constante que pour une source de la forme $\delta(0)$.
+La discrétisation de $\mu$ s'est faite dans notre cas avec une quadrature de Gauss-Legendre. Une discrétisation à $N_\mu$ points est donc censée pouvoir intégrer exactement un polynôme de drgré $2N_\mu+1$. Or, vu la continuité des fonctions en présence, l'intégration est donc rapidement exacte. C'est en effet ce que l'on peut observer dans les \autoref{fig:lm_d1} et \autoref{fig:lm_d} ou les courbes sont les mêmes quand $N_\mu$ dépasse la dizaine. On observe cependant que la convergence se fait plus vite pour une source constante que pour une source de la forme $\delta(0)$.
 \begin{figure}
   \centering
   \include{loop_nb_pts_mu_delta}
   \caption{Courbes pour différents niveaux de discrétisation de $N_\mu$ dans le cas d'une experience à source en $\delta(0)$.}
-  \label{fig:lm_d}
+  \label{fig:lm_d1}
 \end{figure}
 
 \begin{figure}
@@ -414,14 +398,14 @@ Plutôt que de montrer que les courbes des expériences avec diffusion convergai
   \centering
   \include{nb_segs_diff_L2_cste}
   \caption{Courbe de la distance relative de l'approximation à la solution exacte en fonction du nombre de pas de la discrétisation spatiale. Le cas présenté ici est celui d'une source constante unitaire sur le segment $[0,1]$.}
-  \label{fig:Nx_diff_d}
+  \label{fig:Nx_diff_c}
 \end{figure}
 
 
 
 
 \section{Commentaires}
-Les questions non présentées ici, à savoir 17.1 et 17.2 sur le schém upwind n'ont pas pu être traitées faute de temps. De même peu\footnote{Erratum : lire \emph{aucune}.} de comparaisons ont été faites entre les codes déterministe et stochastiques, mais ce sera fait pendant la présentation (on l'espère...).
+Les questions non présentées ici, à savoir 17.1 et 17.2 sur le schéma upwind n'ont pas pu être traitées faute de temps. De même peu\footnote{Erratum : lire \emph{aucune}.} de comparaisons ont été faites entre les codes déterministe et stochastiques, mais ce sera fait pendant la présentation (on l'espère...).
 
 
 
