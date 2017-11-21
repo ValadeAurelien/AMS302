@@ -152,13 +152,14 @@ La méthode ``diamant'' fait l'hypothèse suivante :
 Pour simplifier les expressions suivantes, on se fixe un $\mu \in  [-1,1]$ et on écrit directement $\phi_i(\mu) = \phi_i$.
 De là, l'équation~\ref{eq:pasdiff} devient (on rajoute un terme source $S$ pour ne pas avoir à refaire les calculs pour la prochaine question) :
 
-\begin{equation}
 \begin{align}
- & \mu \frac{\phi_{i+1}-\phi_i}{\Delta_i} + \Sigma_t \frac{\phi_{i+1}+\phi_i}{2} = S\\
- \Leftrightarrow \quad & 2 \mu (\phi_{i+1}- \phi_i) + \Delta_i \Sigma_t (\phi_{i+1}+\phi_i) = 2 \Delta_i S\\
- \Leftrightarrow \quad & \eta^+ \phi_{i+1} - \eta^- \phi_i = 2 \Delta_i S &&  \text{avec } \eta^{\pm} = 2 \mu \pm \Delta_i \Sigma_t .
- \end{align}
-\end{equation}
+& \mu \frac{\phi_{i+1}-\phi_i}{\Delta_i} + \Sigma_t \frac{\phi_{i+1}+\phi_i}{2} = S\\
+\Leftrightarrow \quad
+& 2 \mu (\phi_{i+1}- \phi_i) + \Delta_i \Sigma_t (\phi_{i+1}+\phi_i) = 2 \Delta_i S\\
+\Leftrightarrow \quad
+& \eta^+ \phi_{i+1} - \eta^- \phi_i = 2 \Delta_i S
+&& 	\text{avec } \eta^{\pm} = 2 \mu \pm \Delta_i \Sigma_t .
+\end{align}
 
 Or, suivant le signe de $\mu$, on n'isolera pas le même terme dans cette équation.
 En effet, si $\mu>0$, les conditions de flux entrant ne donnent une information qu'en $x=0$ : il faut donc utiliser cette relation récurrente afin d'avoir $\phi_{i+1}$ à partir de $\phi_i$, ce qui donne :
@@ -235,13 +236,11 @@ Voici la structure générale du code (prenant en compte la diffusion aussi, pr�
  \section{Limite de diffusion}
  
  Nous nous intéressons maintenant au cas de matériaux très diffusants et peu absorbants, correspondants au problème suivant, caractérisé par un paramètre $\epsilon$ :
- \begin{equation}
   \begin{align}
    &\Sigma_a(x) = \epsilon \sigma_a\\
    &\Sigma_t(x) = \frac{\sigma_t}{\epsilon}\\
    &\Sigma_s(x) = \frac{\sigma_t}{\epsilon} - \epsilon \sigma_a
   \end{align}
- \end{equation}
  assorti d'une source uniforme $S = \epsilon$ et des conditions aux limites de flux entrant nul.
  On note $\Phi_\epsilon$ la solution du problème\ref{eq:principal} dans ces conditions, et $\Phit_\epsilon$ le flux scalaire associé :
  \begin{equation}
@@ -276,14 +275,28 @@ Regardons ensuite tout d'abord le terme devant la puissance $\epsilon^1$, divis�
 \end{equation}
 Le dernier terme de droite donne l'idée d'intégrer le terme devant le facteur $\epsilon^0$ en premier lieu multiplié par $\mu$ :
 \begin{equation}
- \frac{1}{2} \int_{-1}^1 \mu^2 \dx{\Phi_0(x)} d\mu + \textcolor{red}{\sigma_t \times \frac{1}{2}\int_{-1}^1  \mu \Phi_1 d\mu} - 0
- \quad = \quad \frac{1}{3} \dx{\Phi_0} + \sigma_t \times \frac{1}{2}\int_{-1}^1  \mu \Phi_1 d\mu
+ \frac{1}{2} \int_{-1}^1 \mu^2 \frac{d\Phi_0}{dx} d\mu + \sigma_t \times \frac{1}{2}\int_{-1}^1  \mu \Phi_1 d\mu - 0
+ \quad = \quad \frac{1}{3} \frac{d\Phi_0}{dx} + \textcolor{red}{\sigma_t \times \frac{1}{2}\int_{-1}^1  \mu \Phi_1 d\mu}
  \quad = \quad 0
 \end{equation}
 
+On voit qu'il reste une chose supplémentaire à faire, à savoir dériver la dernière équation par rapport à $x$, ce qui nous laisse :
 
+\begin{equation}
+- \frac{1}{3 \sigma_t} \frac{d^2 \Phi_0}{d x^2}(x) + \sigma_a\Phi_0(x) = 1 .
+\end{equation}
+
+C'est cette équation que vérifie $\Phi_\epsilon$ lorsque $\epsilon$ tend vers 0, car $\lim\limits_{\epsilon \rightarrow 0} \Phi_\epsilon = \Phi_0$.
 
 \question{13.2}{Dans le cas où on prend $\sigma_a = 0$ et $\sigma_t = 1$, trouver la limite de $\Phi_\epsilon$ lorsque $\epsilon$ tend vers 0.}
+
+D'après la question précédente, dans ce cas l'équation vérifiée est :
+\begin{equation}
+- \frac{1}{3} \frac{d^2 \Phi_0}{d x^2}(x) = 1 .
+\end{equation}
+Les solutions de cette équation sont de la forme $\Phi_0(x) = -\frac{3}{2}x^2 + a x +b$, avec $a$ et $b$ des constantes à déterminer avec les conditions aux limites : on sait que $\Phi_0(0,\mu >0) = \Phi_0(1,\mu <0) = 0$.
+Or, $\Phi_0(x,\mu) = \Phi_0(x) \quad \forall \mu \in [-1,1]$, donc cela nous permet de conclure sur $\Phi_0(x) = \frac{3}{2}x(1-x)$.
+
 \question{14.1}{Dans ce dernier cas, trouver la solution $\Phit_\epsilon$ avec votre code pour $\epsilon = 1, 0.1, 0.01$. Que peut-on constater ?}
 \question{14.2}{Donner le nombre d'itérations de la source itérée pour chaque valeur de $\epsilon$, que peut-on constater ?}
 \question{15.1}{En quoi la discrétisation en $\mu$ influence t-elle les résultats ?}
@@ -292,160 +305,6 @@ Le dernier terme de droite donne l'idée d'intégrer le terme devant le facteur 
 \question{16.2}{Répéter l'expérience de la question 14 ; que peut-on constater ?}
 \question{17.1}{Remplacer le schéma ``diamant'' par un schéma ``upwind''.}
 \question{17.2}{Reprendre la question 14 ; que peut-on constater ?}
- 
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
- 
-\section{Matériau purement absorbant}
-
-\subsection{Matériau homogène - source ponctuelle}
-
-\question{3}{Trouver la solution analytique au problème \autoref{eq:principal} avec les conditions suivantes :}
-
-\begin{equation}
-  \Sigma_s=0, ~~~ \dx{\Sigma_t} = 0, ~~~ S(x, \mu) = \delta(x)
-\end{equation}
-
-
-
-
-
-Ces fonctions sont représentés dans la \autoref{fig:delta_many_mu}.
-
-
-
-\question{4-6}{Implémenter le code Monte-Carlo pour ce modèle}
-
-Cf code commenté.
-
-
-
-\subsection{Matériau homogène - source uniforme}
-
-\question{5}{Trouver la solution analytique au problème \autoref{eq:principal} avec les conditions suivantes :}
-
-\begin{equation}
-  \Sigma_s=0, ~~~ \dx{\Sigma_t} = 0, ~~~ S(x, \mu) = 1
-\end{equation}
-On a donc en considérant un flux entrant nul à gauche 
-\begin{gather}
-  \dx{\Phi} + \frac{\Sigma_t}{\mu} \Phi = \frac{1}{\mu} \\
-  \begin{cases}
-    \Phi(x, \mu)= \frac{1}{\Sigma_t}\left( 1-e^{-\frac{\Sigma_t}{\mu}x}\right) &~~~ \mbox{si } \mu>0 \medskip \\ %\frac{1}{\mu}e^{-\frac{\Sigma_t}{\mu}x} +
-    \Phi(x, \mu)= \frac{1}{\Sigma_t}\left( 1-e^{-\frac{\Sigma_t}{\mu}(x-1)}\right) &~~~ \mbox{si } \mu<0 
-  \end{cases}
-\end{gather}
-
-Ces résultats sont visibles en \autoref{fig:cste_many_mu}, et les résultats des Monte-Carlo sont rassemblés en \autoref{fig:sigmacst}.
-
-
-\subsection{Matériau hétérogène - source ponctuelle}
-
-\question{6}{Trouver la solution analytique au problème \autoref{eq:principal} avec les conditions suivantes :}
-
-\begin{equation}
-  \Sigma_s=0, ~~~
-  \Sigma_t =
-  \begin{cases}
-    1 &\mbox{si } x<0.3 \\
-    3 &\mbox{si } 0.3<x<0.7 \\
-    1 &\mbox{si } 0.7<x \\
-  \end{cases}
-  , ~~~ S(x, \mu) = \delta(x)
-\end{equation}
-
-On pose l'intégrale continue de $\Sigma_t(x)$ 
-\begin{equation}
-  \intsigma(x) =
-  \begin{cases}
-    x &\mbox{si } x<0.3 \\
-    3(x-0.3)+0.3 &\mbox{si } 0.3<x<0.7 \\
-    (x-0.7)+1.5 &\mbox{si } 0.7<x \\
-  \end{cases}
-\end{equation}
-
-On résout sur l'intervale $x\in[0,0.3]$ comme dans la question 3 :
-\begin{equation}
-  \Phi(x, \mu) = \frac{1}{\mu} e^{-\frac{\Sigma_t x)}{\mu}} ~~~ \mbox{si } x<0.3
-\end{equation}
-et on prolonge sur tout le segment grâce à $\intsigma(x)$ 
-\begin{equation}
-  \Phi(x, \mu) = \frac{1}{\mu} e^{-\frac{\intsigma(x)}{\mu}} 
-\end{equation}
-que l'on peut voir représentée en \autoref{fig:phi}.
-
-
-
-\textbf{Attention : } ce raisonnement ne fonctionne que pour des particules partant de $x=0$ ! La loi de probabilité d'aller à une distance $x$ a une toute autre forme si la source est quelconque.
-
-\question{7}{Implémenter un solveur Monte-Carlo utilisant la méthode de Woodcock pour échantillonner le libre parcours de neutrons dans un tel matériau. On fournira les mêmes résultats que pour la question 4.}
-
-Suite à notre incompréhension de la méthode de Woodcock nous avons choisi d'implémenter un autre méthode pour résoudre ce problème. Elle est plus mathématique et ne fonctionne que pour une source ponctuelle en $x=0$.
-
-On normalise pour obtenir une loi de probabilité
-\begin{equation}
-  P(x) = \frac{\lambda}{\mu}
-  \begin{cases}
-    \exp(-x/\mu)         & x<0.3\\
-    \exp(-(3x-0.6)/\mu) & 0.3<x<0.7\\
-    \exp(-(x+0.8)/\mu)  & 0.7<x
-  \end{cases}
-\end{equation}
-et on y associe une fonction de répartition
-\begin{equation}
-  \F(x) = \lambda
-  \begin{cases}
-    C_1 - \exp(-x/\mu)             & x<0.3\\    
-    C_2 - 1/3 \exp(-(3x-0.6)/\mu) & 0.3<x<0.7\\
-    C_3 - \exp(-(x+0.8)/\mu)      & 0.7<x      
-  \end{cases}
-\end{equation}
-avec
-\begin{align}
-  &C_1 = 1 && \F(0)=0 \\
-  &C_2 = 1 - 2/3 \exp(0.3/\mu) && \mbox{continuité en }x=0.3 \\
-  &C_3 = C_2 + 2/3 \exp(-1.5/\mu) &&  \mbox{continuité en }x=0.7 \\
-  &\lambda = 1/C_3 &&  \F(x)  \xrightarrow[x \to \infty]{} 1
-\end{align}
-
-On trace le résultat de cette simulation pour $\mu=0.75$ en \autoref{fig:sigmavar}. Le résultat semble largement satisfaisant.
-
-
-\section{Matériau diffusif}
-
-On travaille maintenant avec un matériau diffusif. Pour cela on considère $\Sigma_t = \Sigma_a + \Sigma_s$. L'algorithme est le suivant : 
-
-\begin{verbatim}
-particule = [] // Coordonnées de chaque rebond (tableau initialement vide) 
-x=source() // La source génère une particule                                      
-proba_abs = ranf() // On tire une variable aléatoire (pour absorbtion)
-
-tantque ( proba_abs>sigma_a/sigma_t ) {
-    si ( x<0 ou x>1 ) fin 
-    sinon {
-        proba_abs = ranf()  // On tire une variable aléatoire (pour absorbtion)
-        proba_diff = ranf() // On tire une variable aléatoire  (pour diffusion)
-        si ( p_diff<sigma_s/sigma_t ) {
-            ajoute_a_la_fin(x, particule)
-            mu = 2*ranf()-1 // On retire mu dans [0,1]
-        }
-        x = x + propagateur(mu, sigma) // On propage la particule
-    }
-}
-\end{verbatim}
-
-Des résultats de ce code pour différents types de source sont donnés en \autoref{fig:TP1_diff}. On trace aussi en \autoref{fig:nbjumps} la distribution du nombre de sauts par particules dans un système à source constante sur $[0,1]$. Cette répartition semble qualitativement être une exponentielle décroissant proportionnellement à $\Sigma_a/\Sigma_t$ et sensible au type de source (non tracé ici).
-
-
-\section{Étude de la vitesse de convergence}
-
-On étudie pour le cas simple sans diffusion à source ponctuelle en $0$ avec $\Sigma_t=1, \mu=1$ la vitesse de convergence vers la solution en fonction du nombre de particules. On trace en \autoref{fig:vcv} la courbe $e_{L^2}(N_{\text{part}})$ à l'aide du script \texttt{convergence.sh}. On remarque une convergence d'ordre un par rapport au nombre de particules.   
 
 
 \end{document}
