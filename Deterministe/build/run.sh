@@ -22,12 +22,12 @@
 ########################
 ### CHOIX EXPERIENCE ###
 ########################
-#EXPE=bac_a_sable
+EXPE=bac_a_sable
 #EXPE=two_steps
 #EXPE=scattering
 #EXPE=loop_nb_pts_mu
 #EXPE=epsilon_abs
-EXPE=loop_nb_segs
+#EXPE=loop_nb_segs
 
 function do_it {
     echo 
@@ -51,19 +51,19 @@ function do_it {
 
 if [[ $EXPE == "bac_a_sable" ]]
 then
-    expe_type=1
+    expe_type=3
     nb_segs=1000
-    mu=-1
-    nb_pts_mu=10
-    sigma_at=2
-    sigma_a_arg1=5
+    mu=1
+    nb_pts_mu=100
+    sigma_at=3
+    sigma_a_arg1=1
     sigma_st=1
-    sigma_s_arg1=1
-    sourcet=2
+    sigma_s_arg1=1000
+    sourcet=1
     source_arg1=1
     epsilon=1e-3
-    output_style=3
-    fname=./datas/output_${expe_type}_${mu}_${sigma_a_arg1}_${sourcet}
+    output_style=1
+    fname=./datas/output_${expe_type}_TS_${sigma_a_arg1}_${sourcet}
     
     do_it $EXPE $expe_type $nb_segs $mu $nb_pts_mu $sigma_at $sigma_a_arg1 $sigma_st $sigma_s_arg1 $epsilon $sourcet $source_arg1 $output_style $fname 
 elif [[ $EXPE == "two_steps" ]]

@@ -29,7 +29,7 @@
 \newcommand{\F}{\mathcal{F}}
 \newcommand{\Qt}{\widetilde{Q}}
 \newcommand{\Phit}{\widetilde{\Phi}}
-%\makeatletter \def\input@path{{Graphics/}} \makeatother
+\makeatletter \def\input@path{{Graphics/}} \makeatother
 
 \begin{document}
 
@@ -181,10 +181,35 @@ donc si l'on change la définition des $\eta$ en $\eta^{\pm} = 2|\mu| \pm \Delta
 \end{equation}
 Il faut simplement faire attention à bien retourner le vecteur $(\phi_i)$.
 
+Pour les courbes, se reporter à la question 10.
 \subsection{Matériau homogène - source uniforme}
 
 \question{10}{Reprendre la démarche de la question 9 pour ces nouvelles conditions. On veillera à ce que les fonctionnalités
  ajoutées dans le solveur pour le traitement du terme source restent compatibles avec le traitement du flux entrant imposé nécessaire pour la question 9.}
+
+Les deux fonctionnalités du code sont compatibles, le cas général d'une source sous forme d'une fonction de $x$ étant utilisée\footnote{De même pour les différents coefficients de diffusion bien que la méthode de résolution ne soit pas systématiquement adaptée !!!}. Il faut cependant veiller aux conditions intiales qui ne sont pas forcément les mêmes. Cette méthode de résolution nous a fournis les résultats que l'ont peut voir en \autoref{fig:exple_a}, \autoref{fig:exple_b} et \autoref{fig:exple_c}. Dans tous ces exemples on a $N_x=10^{3}$ et une erreur relative de l'ordre de $10^{-3}$. On peut en effet noter que les deux courbes tracées dans chaque figures sont complètement confondues. 
+
+\begin{figure}
+  \centering
+  \include{output_1_neg1_5_1}
+  \caption{Exemple de résultat du solveur ``diamant'' pour un cas sans diffusion, $\mu=-1, \sigma=5$ et un source constante sur $[0,1]$.}
+  \label{fig:exple_a}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \include{output_1_1_5_1}
+  \caption{Exemple de résultat du solveur ``diamant'' pour un cas sans diffusion, $\mu=1, \sigma=5$ et un source constante sur $[0,1]$.}
+  \label{fig:exple_b}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \include{output_1_05_5_2}
+  \caption{Exemple de résultat du solveur ``diamant'' pour un cas sans diffusion, $\mu=0.5, \sigma=5$ et un source de la forme $\delta(0)$.}
+  \label{fig:exple_c}
+\end{figure}
+
 
  \subsection{Matériau non homogène - courant entrant unitaire}
  
@@ -199,7 +224,28 @@ Il faut simplement faire attention à bien retourner le vecteur $(\phi_i)$.
 \end{equation}
 
 \question{11}{Reprendre la démarche de la question 9 pour ces nouvelles conditions.
-On s'attachera à ce que les fonctionnalités ajoutées pour le traitement de sections efficaces variables restent compatibles avec le reste du solveur tel que développé dans les questions précédentes.}
+  On s'attachera à ce que les fonctionnalités ajoutées pour le traitement de sections efficaces variables restent compatibles avec le reste du solveur tel que développé dans les questions précédentes.}
+
+Encore une fois, la partie principale du code déterministe ne fait pas la différence entre ce nouveau cas et les anciens puisque les coefficients sont représentés comme des fonctions\footnote{Et sont en réalité des functor je crois...}. Le solveur permet ainsi de dépasser la formulation exacte que nous avions précedemment calculée car celle ci considère le cas strict de $\Sigma_t=1, 3, 1$ alors que l'on peut aisément changer ces valeurs (en gardant le rapport multiplicatif $\times3$ de la marche) dans le code, et c'est ce que l'on montre en \autoref{fig:ts_3}. On peut aussi changer de type de source et utiliser une source constante sur $[0,1]$ ainsi que toute valeur positive ou négative de $\mu$. Dans les \autoref{fig:ts_1} et \autoref{fig:ts_05} on se restreint à changer $\mu$. Dans tous ces cas on reste à $N_x=10^3$ et on a une erreur de l'ordre de $10^{-3}$.
+\begin{figure}
+  \centering
+  \include{output_two_steps_1_1_1_2}
+  \caption{Courbes théorique et expérimentale pour $\sigma_t(x)$ avec une marche. On prend ici $\mu=1$. }
+  \label{fig:ts_1}
+\end{figure}
+\begin{figure}
+  \centering
+  \include{output_two_steps_1_05_1_2}
+  \caption{Courbes théorique et expérimentale pour $\sigma_t(x)$ avec une marche. On prend ici $\mu=.5$. }
+  \label{fig:ts_05}
+\end{figure}
+\begin{figure}
+  \centering
+  \include{output_two_steps_1_05_3_2}
+  \caption{Courbes théorique et expérimentale pour $\sigma_t(x)$ avec une marche. On prend ici $\mu=.5$, mais on prend aussi un coeficient multiplicatif sur $\Sigma_t$ d'un facteur $3$. }
+  \label{fig:ts_3}
+\end{figure}
+
 
 \section{Matériau diffusant}
 
@@ -296,54 +342,93 @@ D'après la question précédente, dans ce cas l'équation vérifiée est :
 - \frac{1}{3} \frac{d^2 \Phi_0}{d x^2}(x) = 1 .
 \end{equation}
 Les solutions de cette équation sont de la forme $\Phi_0(x) = -\frac{3}{2}x^2 + a x +b$, avec $a$ et $b$ des constantes à déterminer avec les conditions aux limites : on sait que $\Phi_0(0,\mu >0) = \Phi_0(1,\mu <0) = 0$.
-Or, $\Phi_0(x,\mu) = \Phi_0(x) \quad \forall \mu \in [-1,1]$, donc cela nous permet de conclure sur $\Phi_0(x) = \frac{3}{2}x(1-x)$.
+Or, $\Phi_0(x,\mu) = \Phi_0(x) \quad \forall \mu \in [-1,1]$, donc cela nous permet de conclure sur $\Phi_0(x) = \frac{3}{2}x(1-x)$. Nous avons donc essayé d'atteindre cette limite avec notre programme, le résultat est présenté en \autoref{fig:limit_sigma_zero} ou l'on peut voir que notre courbe est \emph{exactement} deux fois plus grande...
 
-\questions{14 et 16}{Dans ce dernier cas, trouver la solution $\Phit_\epsilon$ avec votre code pour $\epsilon = 1, 0.1, 0.01$. Donner le nombre d'itérations de la source itérée pour chaque valeur de $\epsilon$. Que peut-on constater ?}
+\begin{figure}
+  \centering
+  \include{output_limit_sigma_a_zero}
+  \caption{Courbes théorique pour le cas limite $\epsilon=0$ avec $\sigma_a=0$ et expérimentale pour $\epsilon=0.001$.}
+  \label{fig:limit_sigma_zero}
+\end{figure}
 
-Ci-dessous se trouve un tableau donnant le nombre d'itérations nécessaires à la convergence ($\norm{Q_1 - Q_0}>10^{-3}$, voir l'algorithme de la question 12), pour chaque valeur de $\epsilon$, et avec ou sans accélération par diffusion synthétique.
-Une expérience n'aura pas convergé si la condition de convergence n'est toujours pas remplie au bout de 10000 itérations (équivalant à environ 40s).
-Dans ce cas, ce ne sera pas le nombre d'itérations mais la valeur de $\norm{Q_1 - Q_0}$ qui sera présentée dans le tableau.
+\questions{14 et 16}{Dans ce dernier cas, trouver la solution $\Phit_\epsilon$ avec votre code pour $\epsilon = 1, 0.1, 0.01$. Donner le nombre d'itérations de la source itérée pour chaque valeur de $\epsilon$. Que peut-on constater ? (16.1) Implémenter dans le code l'accélération par diffusion synthétique. (16.2) Répéter l'expérience de la question 14 ; que peut-on constater ?}
 
-\begin{tabular}{|c|c|c|c|}
-  \hline
-  $\epsilon = $ & 1 & 0.1 & 0.01 \\
-  \hline\hline
-  \textit{sans} DSA & 1.1 & 1.2 & 1.3 \\
-  \textit{avec} DSA & 2.1 & 2.2 & 2.3 \\
-  \hline
-\end{tabular}
+Nous avons mis en place la méthode DSA comme indiquée dans le cours. Pour cela nous avons codé un solveur d'éléments fini en 1D avec des conditons de Dirichlet aux bords. On peut trouver le détail du solveur générique dans le fichier \texttt{fe1D\_solver.hpp}. Il est intéressant de noter que pour l'inversion du système, deux solveurs de la librairie \texttt{Eigen} ont été utlisés
+\begin{enumerate}
+\item le gradient conjugué ;
+\item une méthode de Cholesky dite LLTD ;
+\end{enumerate}
+le choix s'étant porté sur le solveur directe 2, environ dix fois plus rapide. L'utilisation de la méthode DSA permet en effet de bien meilleurs résultats : le nombre d'itérations et donc le temps de calcul sont fortement réduits comme on peut le voir dans les valeurs reportées dans le \autoref{tab:DSA}. 
 
-%\include{loop_nb_pts_mu_delta.tex}
-%\include{output_1_neg1_5_1.tex}
-%\include{output_1_1_5_1.tex}
-%\include{output_two_steps_1_1_1_2.tex}
-%\include{output_1_05_5_2.tex}
-%\include{output_two_steps_1_05_3_2.tex}
-%\include{output_two_steps_1_05_1_2.tex}
-%\include{nb_segs_diff_L2_delta.tex}
-\include{nb_segs_diff_L2_cste.tex}
+\begin{table}
+  \centering
+  \begin{tabular}{c|ccc}
+    $\varepsilon $ & .1 & 0.01 & 0.001 \\
+    \hline
+    Boucles \textit{sans} DSA & 761 & $>10^5$ & $>10^5$ \\
+    Boucles \textit{avec} DSA & 32 & 46 & 313 \\
+  \end{tabular}
+  \hspace{50pt}
+  \begin{tabular}{c|ccc}
+    $\varepsilon $ & .1 & 0.01 & 0.001 \\
+    \hline
+    Tps calcul \textit{sans} DSA & 2.9 & 40 & 40 \\
+    Tps calcul \textit{avec} DSA & 0.15 & 0.22 & 1.5 \\
+  \end{tabular}
+\caption{Vitesses de convergence pour les schémas avec ou sans DSA.}
+\label{tab:DSA}
+\end{table}
 
-\include{loop_nb_pts_mu_delta.tex}
-%\include{output_1_neg1_5_1.tex}
-%\include{loop_nb_pts_mu_cste}
-%\include{output_1_1_5_1}
-%\include{output_two_steps_1_1_1_2}
-%\include{output_1_05_5_2}
-%\include{output_two_steps_1_05_3_2}
-%\include{output_two_steps_1_05_1_2}
-%\include{nb_segs_diff_L2_delta}
-%\include{nb_segs_diff_L2_cste}
 
 \question{15.1}{En quoi la discrétisation en $\mu$ influence t-elle les résultats ?}
-\question{15.2}{En quoi la discrétisation en espace influence t-elle les résultats ?}
-\question{16.1}{Implémenter dans le code l'accélération par diffusion synthétique.}
-\question{16.2}{Répéter l'expérience de la question 14 ; que peut-on constater ?}
-\question{17.1}{Remplacer le schéma ``diamant'' par un schéma ``upwind''.}
-\question{17.2}{Reprendre la question 14 ; que peut-on constater ?}
 
-\include{loop_nb_pts_mu_cste.tex}
+La discrétisation de $\mu$ s'est faite dans notre cas avec une quadrature de Gauss-Legendre. Une discrétisation à $N_\mu$ points est donc censée pouvoir intégrer exactement un polynôme de drgré $2N_\mu+1$. Or, vu la continuité des fonctions en présence, l'intégration est donc rapidement exacte. C'est en effet ce que l'on peut observer dans les \autoref{fig:lm_d} et \autoref{fig:lm_c} ou les courbes sont les mêmes quand $N_\mu$ dépasse la dizaine. On observe cependant que la convergence se fait plus vite pour une source constante que pour une source de la forme $\delta(0)$.
+\begin{figure}
+  \centering
+  \include{loop_nb_pts_mu_delta}
+  \caption{Courbes pour différents niveaux de discrétisation de $N_\mu$ dans le cas d'une experience à source en $\delta(0)$.}
+  \label{fig:lm_d}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \include{loop_nb_pts_mu_cste}
+  \caption{Courbes pour différents niveaux de discrétisation de $N_\mu$ dans le cas d'une experience à source constante unitaire sur $[0,1]$.}
+  \label{fig:lm_d}
+\end{figure}
+
+
+
+\question{15.2}{En quoi la discrétisation en espace influence t-elle les résultats ?}
+
+Plutôt que de montrer que les courbes des expériences avec diffusion convergaient quand $N_x$ tend vers de gradnes valeurs, nous avons choisi de tracer l'erreur en fonction du pas spaciale dans un cas ou la solution exacte était bien définie. C'est ce que nous avons fait dans les \autoref{fig:Nx_diff_d} et \autoref{fig:Nx_diff_c}. Grâce à une regression linéraire on voit rapidement que la distance relative de l'approximation à la solution exacte décroît en $N_x^{-1}$.
+
+\begin{figure}
+  \centering
+  \include{nb_segs_diff_L2_delta}
+  \caption{Courbe de la distance relative de l'approximation à la solution exacte en fonction du nombre de pas de la discrétisation spatiale. Le cas présenté ici est celui d'une source ponctuelle en 0.}
+  \label{fig:Nx_diff_d}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \include{nb_segs_diff_L2_cste}
+  \caption{Courbe de la distance relative de l'approximation à la solution exacte en fonction du nombre de pas de la discrétisation spatiale. Le cas présenté ici est celui d'une source constante unitaire sur le segment $[0,1]$.}
+  \label{fig:Nx_diff_d}
+\end{figure}
+
+
+
+
+\section{Commentaires}
+Les questions non présentées ici, à savoir 17.1 et 17.2 sur le schém upwind n'ont pas pu être traitées faute de temps. De même peu\footnote{Erratum : lire \emph{aucune}.} de comparaisons ont été faites entre les codes déterministe et stochastiques, mais ce sera fait pendant la présentation (on l'espère...).
+
+
+
 
 \end{document}
+
+
 
 %%% Local Variables:
 %%% mode: latex
