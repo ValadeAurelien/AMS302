@@ -7,7 +7,7 @@ project(deterministe)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-O0 -g")
+set(CMAKE_CXX_FLAGS "-O3") #"-O0 -g")
 
 # Includes directory
 include_directories(${PROJECT_SOURCE_DIR} /usr/local/include/Eigen)
