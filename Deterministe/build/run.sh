@@ -1,4 +1,27 @@
 #! /bin/sh
+
+##############
+### HELPER ###
+#########################################################################
+# expe_type     = 1 (pas de diff) , 2 (diff), 3 (DSA)                   #
+# nb_segs       = partition de l'espace				        #
+# mu            = valeur de mu (quand utilisée, sinon inutile)	        #
+# nb_pts_mu     = partition des mus (quand utilisées, sinon inutile)	#
+# sigma_at      = 1 (constante), 3 (marches)				#
+# sigma_a_arg1  = valeur de sigma absorbtion				#
+# sigma_st      = 1 (constante), 3 (marches)				#
+# sigma_s_arg1  = valeur de sigma diffusion				#
+# sourcet       = 1 (constante), 2 (delta(0))			        #
+# source_arg1   = valeur de la source				        #
+# epsilon       = critère d'arret de la boucle quand diffusion	        #
+# output_style  = 1 (plot), 2 (file), 3 (les deux), autre (rien)	#
+# fname         = nom du fichier en sortie 				#
+#########################################################################
+
+
+########################
+### CHOIX EXPERIENCE ###
+########################
 #EXPE=bac_a_sable
 #EXPE=two_steps
 #EXPE=scattering
