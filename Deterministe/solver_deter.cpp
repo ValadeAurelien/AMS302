@@ -22,19 +22,20 @@ enum func_t {
     TWO_STEPS = 3
 };
 
+// Masques pour la sortie
 enum output_t {
     OUTPUT_PLOT = 1,
     OUTPUT_FILE = 2
 };
 
+// Plusieurs types d'experience
 enum expe_type_t {
     NO_SCATTERING = 1,
     SCATTERING = 2,
     SCATTERING_DSA = 3
 };
 
-/* Terme source, suivant qu'il est uniforme (typ_source vrai)
-                  ou non-nul seulement en 0 (typ_source faux) */
+/* Terme source */
 struct source_func_t {
     int sourcet;
     double arg1;
@@ -54,6 +55,7 @@ struct source_func_t {
     }
 };
 
+/* Coefficient de l'équation différentielle */
 struct sigma_func_t {
     int sigmat;
     double arg1;
@@ -79,6 +81,8 @@ struct sigma_func_t {
     }
 };
 
+/* Calcul de la solution exacte 
+   beaucoup de cas particuliers */
 struct phi_func_t {
     double mu;
     sigma_func_t& sigma_a_func,
@@ -127,6 +131,7 @@ struct phi_func_t {
     }
 };
 
+/* Wrapper du solver FE 1D du fichier fe1D_solver.hpp */
 struct DSA_solver_t {
     const sigma_func_t& sigma_a_func,
 	&sigma_s_func;
@@ -152,11 +157,13 @@ struct DSA_solver_t {
     }
 };		     
 
-/* Phi déterministe avec diffusion */
+/* Phi déterministe avec diffusion 
+   tout est la dessous... */
 VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
 			   sigma_func_t& sigma_a_func, sigma_func_t& sigma_s_func,
 			   source_func_t& source_func,
 			   double epsilon, bool DSA) {
+    // Initialisation
     VectorXd X = linspacePts(0,1,nb_pts),
 	Q = X.unaryExpr(source_func),
 	Qt = Q,
@@ -175,23 +182,29 @@ VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
     DSA_solver_t DSA_Solver (sigma_a_func, sigma_s_func, dQ, f_DSA);
     if (DSA)
 	DSA_Solver.init();
-	
+
+    // Calcul des points d'interpolation des mu.
+    // La fonction est définie dans utils.hpp
     get_gauss_lengendre_pts_wghts(vec_mus, weights);
     //get_cst_pts_wghts(vec_mus, weights);
     clock_t timer = clock();
     do {
+	// Réinitialisation de phi
 	phi.fill(0);
+	// Si on a fait trop de tours on s'en va !
 	if (count++ > MAX_COUNT) {
-	    cout << "norm & eps : " << dQ.norm()
+	    cout << endl << "norm & eps : " << dQ.norm()
 		 << " " << epsilon << " " << endl;
 	    cout.flush();				      
 	    throw range_error("Could not converge...");
 	}
+	// Tous les 100 tours on donne des nouvelles
 	if (! (count%100) ) {
 	    cout << "\r#Nb loops : " << setw(5) << count
 		 << " et |dQ| = " << setw(7) << setprecision(4) << dQ.norm();
 	    cout.flush();
 	}
+	// Mu négatifs (les premiers de l'interpolation)
 	for (nmu=0; nmu<nb_pts_mu/2; ++nmu) {
 	    switch (source_func.sourcet) {
 	    case DELTA:
@@ -213,6 +226,7 @@ VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
 		x -= dx;
 	    }
 	}
+	// Mu positifs
 	for (nmu=nmu; nmu<nb_pts_mu; ++nmu) {
 	    if (vec_mus(nmu)==0)
 		continue;
@@ -236,11 +250,16 @@ VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
 		x += dx;
 	    }
 	}
+	// Mise a jour du terme source
 	Qt = Q;
 	Q = X.unaryExpr(source_func) + sigma_s_func(0)/2. * phi;
 	dQ = Q-Qt;
+	// Si DSA, on finit le boulot
 	if (DSA) {
 	    f_DSAt = f_DSA;
+	    // On lance une exception si on a pas pu résoudre le
+	    // système (ca n'arrive pas si le problème est bien
+	    // posé... 
 	    try { DSA_Solver.solve(); }
 	    catch (no_convergence& e) {
 		cout << "After " << count << " iterations" << endl;
@@ -250,6 +269,7 @@ VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
 	    dQ = Q-Qt;
 	}
     } while (dQ.norm()>epsilon);
+    // On affiche quelques informations intéressantes et on s'en va.
     timer = clock() - timer;
     cout << endl << "#Exited loop after "
 	 << setw(5) << count << " iterations in "
@@ -258,6 +278,9 @@ VectorXd Phi_deter_many_mu(Index nb_pts, int nb_pts_mu,
     return phi;
 }
 
+/* Fonction pour la résolution sans diffusion 
+   quelques cas particuliers pour les conditions aux limites
+   ainsi que pour le signe de mu */
 VectorXd Phi_deter(int nb_pts, double mu,
 		   sigma_func_t& sigma_t_func,
 		   source_func_t& source_func) {
@@ -304,6 +327,7 @@ VectorXd Phi_deter(int nb_pts, double mu,
     return phi;
 }
 
+/* Fonction principale... */
 int main(int argc, char**argv) {
     // Vérification des arguments en entrée 
     if (argc<12) {
@@ -345,7 +369,9 @@ int main(int argc, char**argv) {
 	else
 	    fname = "output";
     }
-    
+
+    // En fait on donne le nombre de segments, il y a un point en plus
+    // ce point est en fait celui en x=1
     Index nb_pts = nb_segs+1;
     switch(expe_type) {
     case NO_SCATTERING:
@@ -356,10 +382,15 @@ int main(int argc, char**argv) {
 	sigma_s_arg1=0;
 	break;
     }
+    // Initialisation des structes. Ca evite de passer tous
+    // arguments aux autres fonctions derrière
     source_func_t source_func(sourcet,  source_arg1);
     sigma_func_t sigma_a_func(sigma_at, sigma_a_arg1);
     sigma_func_t sigma_s_func(sigma_st, sigma_s_arg1);
     phi_func_t phi_func(mu, sigma_a_func, sigma_s_func, source_func);
+
+    // Vérification que le calcul est faisable avec
+    // les données en entrées.
     double eta_m;
     switch(expe_type) {
     case NO_SCATTERING:
@@ -379,11 +410,11 @@ int main(int argc, char**argv) {
     	break;
     }
     
-    // Courbe théorique
     VectorXd X = linspacePts(0, 1, nb_pts);
     VectorXd Py (nb_pts),
 	Py_deter(nb_pts);
     bool DSA=false;
+    // On fait vraiment le travail ici ->
     switch(expe_type) {
     case NO_SCATTERING:
 	Py  = X.unaryExpr(phi_func), // vecteurs de la probabilité théorique
@@ -392,8 +423,7 @@ int main(int argc, char**argv) {
     case SCATTERING_DSA:
 	DSA = true;
     case SCATTERING:
-	//Py  = X.unaryExpr(phi_func), // vecteurs de la probabilité théorique
-	Py_deter = Phi_deter_many_mu(nb_pts, nb_pts_mu, sigma_a_func,   // Courbe déterministe
+	Py_deter = Phi_deter_many_mu(nb_pts, nb_pts_mu, sigma_a_func,   
 				     sigma_s_func, source_func,
 				     epsilon, DSA);
 	break;
@@ -401,7 +431,7 @@ int main(int argc, char**argv) {
 	throw invalid_argument("Mauvais argument de type d'expérience");
     }
     
-    //Affichage
+    // Ecriture dans un fichier et plot (la fonction est dans utils.hpp) 
     if (output_style & OUTPUT_FILE) {
     	ofstream file (fname, fstream::out);
     	file << "#";
