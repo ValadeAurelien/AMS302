@@ -187,7 +187,7 @@ Pour les courbes, se reporter à la question 10.
 \question{10}{Reprendre la démarche de la question 9 pour ces nouvelles conditions. On veillera à ce que les fonctionnalités
  ajoutées dans le solveur pour le traitement du terme source restent compatibles avec le traitement du flux entrant imposé nécessaire pour la question 9.}
 
-Les deux fonctionnalités du code sont compatibles, le cas général d'une source sous forme d'une fonction de $x$ étant utilisée\footnote{De même pour les différents coefficients de diffusion bien que la méthode de résolution ne soit pas systématiquement adaptée !!!}. Il faut cependant veiller aux conditions intiales qui ne sont pas forcément les mêmes. Cette méthode de résolution nous a fournis les résultats que l'ont peut voir en \autoref{fig:exple_a}, \autoref{fig:exple_b} et \autoref{fig:exple_c}. Dans tous ces exemples on a $N_x=10^{3}$ et une erreur relative de l'ordre de $10^{-3}$. On peut en effet noter que les deux courbes tracées dans chaque figures sont complètement confondues. 
+Les deux fonctionnalités du code sont compatibles, le cas général d'une source sous forme d'une fonction de $x$ ayant été mis en place\footnote{De même pour les différents coefficients de diffusion bien que la méthode de résolution ne soit pas systématiquement adaptée !!!}. Il faut cependant veiller aux conditions intiales qui ne sont pas forcément les mêmes. Cette méthode de résolution nous a fournis les résultats que l'ont peut voir en \autoref{fig:exple_a}, \autoref{fig:exple_b} et \autoref{fig:exple_c}. Dans tous ces exemples on a $N_x=10^{3}$ et une erreur relative de l'ordre de $10^{-3}$. On peut en effet noter que les deux courbes tracées dans chaque figures sont complètement confondues. 
 
 \begin{figure}
   \centering
@@ -226,7 +226,7 @@ Les deux fonctionnalités du code sont compatibles, le cas général d'une sourc
 \question{11}{Reprendre la démarche de la question 9 pour ces nouvelles conditions.
   On s'attachera à ce que les fonctionnalités ajoutées pour le traitement de sections efficaces variables restent compatibles avec le reste du solveur tel que développé dans les questions précédentes.}
 
-Encore une fois, la partie principale du code déterministe ne fait pas la différence entre ce nouveau cas et les anciens puisque les coefficients sont représentés comme des fonctions\footnote{Et sont en réalité des functor je crois...}. Le solveur permet ainsi de dépasser la formulation exacte que nous avions précedemment calculée car celle ci considère le cas strict de $\Sigma_t=1, 3, 1$ alors que l'on peut aisément changer ces valeurs (en gardant le rapport multiplicatif $\times3$ de la marche) dans le code, et c'est ce que l'on montre en \autoref{fig:ts_3}. On peut aussi changer de type de source et utiliser une source constante sur $[0,1]$ ainsi que toute valeur positive ou négative de $\mu$. Dans les \autoref{fig:ts_1} et \autoref{fig:ts_05} on se restreint à changer $\mu$. Dans tous ces cas on reste à $N_x=10^3$ et on a une erreur de l'ordre de $10^{-3}$.
+Encore une fois, la partie principale du code déterministe ne fait pas de différence entre ce nouveau cas et les anciens puisque les coefficients sont représentés comme des fonctions\footnote{Et sont en réalité des functor je crois...}. Le solveur permet ainsi de dépasser la formulation exacte que nous avions précedemment calculée car celle ci considère le cas strict de $\Sigma_t=1, 3, 1$ alors que l'on peut aisément changer ces valeurs (en gardant le rapport multiplicatif $\times3$ de la marche) dans le code, et c'est ce que l'on montre en \autoref{fig:ts_3}. On peut aussi changer de type de source et utiliser une source constante sur $[0,1]$ ainsi que toute valeur positive ou négative de $\mu$. Dans les \autoref{fig:ts_1} et \autoref{fig:ts_05} on se restreint à changer $\mu>0$. Dans tous ces cas on reste à $N_x=10^3$ et on a une erreur de l'ordre de $10^{-3}$.
 \begin{figure}
   \centering
   \include{output_two_steps_1_1_1_2}
@@ -251,7 +251,7 @@ Encore une fois, la partie principale du code déterministe ne fait pas la diff�
 
 \question{12}{Reprendre la démarche de la question 9 pour traiter ce problème de diffusion.
 Le solveur utilisera la méthode des ordonnées discrètes ($S_N$) pour traiter la variable angulaire $\mu$.
-Il n'y a pas de solution analytique dans ce cas ; on s'attachera donc tout particulièrement à la vérification du solveur déterministe par comparaison aux résultats donnés par le solveur Monte Carlo développé au TP1.}
+Il n'y a pas de solution analytique dans ce cas ; on s'attachera donc tout particulièrement à la vérification du solveur déterministe par comparaison aux résultats donnés par le solveur Monte \mbox{Carlo développé au TP1}.}
 
 Voici la structure générale du code (prenant en compte la diffusion aussi, présentée pour $\mu>0$), pour une discrétisation en $N_x$ points en espace et $N_{\mu}$ en direction.
 
@@ -358,7 +358,7 @@ Nous avons mis en place la méthode DSA comme indiquée dans le cours. Pour cela
 \item le gradient conjugué ;
 \item une méthode de Cholesky dite LLTD ;
 \end{enumerate}
-le choix s'étant porté sur le solveur directe 2, environ dix fois plus rapide. L'utilisation de la méthode DSA permet en effet de bien meilleurs résultats : le nombre d'itérations et donc le temps de calcul sont fortement réduits comme on peut le voir dans les valeurs reportées dans le \autoref{tab:DSA}. 
+le choix s'étant porté sur le solveur direct 2, environ dix fois plus rapide. L'utilisation de la méthode DSA permet en effet de bien meilleurs résultats : le nombre d'itérations et donc le temps de calcul sont fortement réduits comme on peut le voir dans les valeurs reportées dans le \autoref{tab:DSA}. 
 
 \begin{table}
   \centering
@@ -394,7 +394,7 @@ La discrétisation de $\mu$ s'est faite dans notre cas avec une quadrature de Ga
   \centering
   \include{loop_nb_pts_mu_cste}
   \caption{Courbes pour différents niveaux de discrétisation de $N_\mu$ dans le cas d'une experience à source constante unitaire sur $[0,1]$.}
-  \label{fig:lm_d}
+  \label{fig:lm_c}
 \end{figure}
 
 
@@ -414,7 +414,7 @@ Plutôt que de montrer que les courbes des expériences avec diffusion convergai
   \centering
   \include{nb_segs_diff_L2_cste}
   \caption{Courbe de la distance relative de l'approximation à la solution exacte en fonction du nombre de pas de la discrétisation spatiale. Le cas présenté ici est celui d'une source constante unitaire sur le segment $[0,1]$.}
-  \label{fig:Nx_diff_d}
+  \label{fig:Nx_diff_c}
 \end{figure}
 
 
